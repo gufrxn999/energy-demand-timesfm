@@ -69,9 +69,9 @@ def main():
     if context_len % 32:
         context_len = context_len - context_len % 32
     train_ds = WindowDataset(split.train, context_len, args.horizon_len, args.samples, args.seed)
+    val_samples = min(256, max(1, len(split.validation) - context_len - args.horizon_len + 1))
     val_ds = WindowDataset(split.validation, context_len, args.horizon_len,
-                           min(256, max(1, len(split.validation) // (context_len + args.horizon_len))),
-                           args.seed + 1)
+                           val_samples, args.seed + 1)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, drop_last=False)
     val_loader = DataLoader(val_ds, batch_size=args.batch_size)
 
