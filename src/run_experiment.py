@@ -70,10 +70,13 @@ def main():
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
     predictions.to_csv(out / "predictions.csv", index=False)
     fig, ax = plt.subplots(figsize=(12, 4))
-    plot = predictions.iloc[:min(len(predictions), 24 * 7)]
+    # Evaluation windows can be spread across the test period. Show a single
+    # contiguous forecast window rather than connecting separate dates in a line.
+    plot = predictions.iloc[:min(len(predictions), args.horizon)]
     ax.plot(plot["timestamp"], plot["actual"], label="Actual", linewidth=1.8)
     ax.plot(plot["timestamp"], plot["forecast"], label=args.model, linewidth=1.5)
-    ax.set(title="Hourly electricity demand: held-out test forecasts", ylabel="Load", xlabel="Time")
+    ax.set(title=f"Hourly demand: {args.horizon}-hour held-out test forecast",
+           ylabel="Load", xlabel="Time")
     ax.legend()
     fig.tight_layout()
     fig.savefig(out / "forecast.png", dpi=160)
