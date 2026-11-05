@@ -1,6 +1,15 @@
 .venv/
+.venv-directml/
 __pycache__/
 *.py[cod]
 data/*.csv
 outputs/*
 !outputs/.gitkeep
+!outputs/timesfm-lora-cpu/
+outputs/timesfm-lora-cpu/*
+!outputs/timesfm-lora-cpu/adapter_config.json
+!outputs/timesfm-lora-cpu/adapter_model.safetensors
+!outputs/timesfm-lora-cpu/project_config.json
+!outputs/timesfm-lora-cpu/README.md
+work_hf_cache/
+work_hf_cache_cpu/
