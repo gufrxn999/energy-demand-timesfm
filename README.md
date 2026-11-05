@@ -29,6 +29,8 @@ The generated data is synthetic and only checks the pipeline. Use real hourly lo
 
 ## Compare models
 
+See [the experiment log](docs/experiment-log.md) for training history, CPU/GPU feasibility, sampled held-out results, and the limits of the current benchmark.
+
 The evaluator defaults to the validation split and uses daily, non-overlapping forecast windows. Use validation while making modeling choices. After the setup is fixed, run one final comparison on the held-out test split:
 
 ```bash
