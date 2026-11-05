@@ -23,8 +23,16 @@ def load_hourly_csv(path: str | Path) -> pd.Series:
     if frame.empty:
         raise ValueError("No valid timestamp/load rows found")
     series = frame.drop_duplicates("timestamp", keep="last").set_index("timestamp")["load"].astype(float)
-    series = series.resample("h").mean().interpolate(method="time", limit=3, limit_direction="both")
-    series = series.dropna()
+    # Carry observations forward only: interpolation can use future values and
+    # leak across a chronological train/validation/test boundary.
+    series = series.resample("h").mean().ffill(limit=3)
+    if series.isna().any():
+        count = int(series.isna().sum())
+        first_gap = series.index[series.isna()][0]
+        raise ValueError(
+            f"Found {count} missing hourly values after forward-filling gaps of up to 3 hours; "
+            f"first unresolved gap is at {first_gap}"
+        )
     if len(series) < 24 * 15:
         raise ValueError("Need at least 15 days of hourly data for this experiment")
     series.name = "load"

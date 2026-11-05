@@ -8,7 +8,7 @@ from src.data import chronological_split, load_hourly_csv
 
 
 class DataTests(unittest.TestCase):
-    def test_load_hourly_csv_sorts_and_interpolates_short_gap(self):
+    def test_load_hourly_csv_sorts_and_forward_fills_short_gap(self):
         timestamps = pd.date_range("2025-01-01", periods=24 * 16, freq="h")
         frame = pd.DataFrame({"timestamp": timestamps, "load": range(len(timestamps))})
         frame = frame.drop(index=100).sample(frac=1, random_state=2)
@@ -20,7 +20,7 @@ class DataTests(unittest.TestCase):
 
         self.assertEqual(len(series), len(timestamps))
         self.assertTrue(series.index.is_monotonic_increasing)
-        self.assertAlmostEqual(series.loc[timestamps[100]], 100.0)
+        self.assertAlmostEqual(series.loc[timestamps[100]], 99.0)
 
     def test_load_hourly_csv_rejects_short_series(self):
         timestamps = pd.date_range("2025-01-01", periods=24 * 14, freq="h")

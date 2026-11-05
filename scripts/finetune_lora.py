@@ -56,9 +56,13 @@ def main():
                          help="Resume from a PEFT adapter directory; --epochs counts additional epochs")
     parser.add_argument("--base-model-name", default=None,
                          help="Canonical base model name to store in adapter metadata")
+    parser.add_argument("--patience", type=int, default=2,
+                         help="Stop after this many non-improving validation epochs; zero disables")
     args = parser.parse_args()
     if args.context_len % 32:
         raise ValueError("TimesFM 2.5 context length must be a multiple of 32")
+    if args.patience < 0:
+        raise ValueError("patience must be zero or a positive number")
 
     from peft import LoraConfig, PeftModel, get_peft_model
     from transformers import TimesFm2_5ModelForPrediction
@@ -88,8 +92,10 @@ def main():
     if args.resume_adapter:
         resume_dir = Path(args.resume_adapter)
         prior_config = json.loads((resume_dir / "project_config.json").read_text())
-        starting_epoch = int(prior_config.get("epochs_completed", 0))
-        best_checkpoint_epoch = int(prior_config.get("checkpoint_epoch", starting_epoch))
+        starting_epoch = int(prior_config.get(
+            "checkpoint_epoch", prior_config.get("epochs_completed", 0)
+        ))
+        best_checkpoint_epoch = starting_epoch
         model = PeftModel.from_pretrained(model, str(resume_dir), is_trainable=True)
     else:
         model = get_peft_model(model, LoraConfig(
@@ -116,6 +122,8 @@ def main():
         print(f"resume_from_epoch={starting_epoch} baseline_validation_loss={best_val:.6f}",
               flush=True)
 
+    completed_epochs = starting_epoch
+    stale_epochs = 0
     for epoch in range(args.epochs):
         total_epoch = starting_epoch + epoch + 1
         model.train()
@@ -140,11 +148,19 @@ def main():
         print(f"epoch={total_epoch}/{starting_epoch + args.epochs} "
               f"validation_loss={val_loss:.6f} epoch_seconds={time.perf_counter() - epoch_start:.1f}",
               flush=True)
+        completed_epochs = total_epoch
         if val_loss < best_val:
             best_val = val_loss
             best_checkpoint_epoch = total_epoch
+            stale_epochs = 0
             output_dir.mkdir(parents=True, exist_ok=True)
             model.save_pretrained(output_dir)
+        else:
+            stale_epochs += 1
+            if args.patience and stale_epochs >= args.patience:
+                print(f"early stopping after {stale_epochs} non-improving validation epochs",
+                      flush=True)
+                break
     if starting_epoch + args.epochs > 0:
         output_dir.mkdir(parents=True, exist_ok=True)
         project_config = {
@@ -152,11 +168,13 @@ def main():
             "context_len": context_len,
             "horizon_len": args.horizon_len,
             "learning_rate": args.lr,
-            "epochs_completed": starting_epoch + args.epochs,
+            "epochs_completed": completed_epochs,
+            "requested_epochs": starting_epoch + args.epochs,
             "checkpoint_epoch": best_checkpoint_epoch,
             "best_validation_loss": best_val,
             "lora_rank": args.lora_r,
             "seed": args.seed,
+            "early_stopping_patience": args.patience,
         }
         (output_dir / "project_config.json").write_text(
             json.dumps(project_config, indent=2) + "\n"
