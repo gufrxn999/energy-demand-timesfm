@@ -35,14 +35,14 @@
   "rank_pattern": {},
   "revision": null,
   "target_modules": [
-    "output_layer",
     "fc1",
-    "input_layer",
+    "output_layer",
     "o_proj",
     "residual_layer",
-    "v_proj",
-    "q_proj",
     "fc2",
+    "q_proj",
+    "input_layer",
+    "v_proj",
     "k_proj"
   ],
   "target_parameters": null,

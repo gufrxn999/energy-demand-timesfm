@@ -1,14 +1,32 @@
-# TimesFM 2.5 PJME LoRA checkpoint
+# TimesFM 2.5 PJME LoRA adapter
 
-This is a **partial checkpoint** from one completed epoch of LoRA fine-tuning on the PJME hourly electricity-demand dataset. The requested five-epoch run was stopped during epoch 2; do not treat this adapter as the completed training run.
+Five epochs of LoRA fine-tuning completed on the PJME hourly electricity-demand dataset. The adapter saved here is the best validation checkpoint, selected from the five completed epochs. The PJME CSV is not included.
+
+## Training setup
 
 - Base model: `google/timesfm-2.5-200m-transformers`
-- Context: 512 hourly observations
+- Context: 512 hours
 - Forecast horizon: 24 hours
-- LoRA rank: 4
-- Dataset: PJME hourly energy demand; the CSV is not included in this repository.
+- Training windows: 2,000 per epoch
+- Batch size: 8
+- LoRA rank: 4, alpha: 8
+- Learning rate: `5e-5`
+- Training device: CPU
+- Data split: chronological, with the final 15% reserved for validation
 
-Load it with PEFT after loading the base model:
+## Validation loss
+
+| Completed epoch | Validation loss |
+| ---: | ---: |
+| 1 (resume baseline) | 0.273803 |
+| 2 (selected checkpoint) | **0.272994** |
+| 3 | 0.275715 |
+| 4 | 0.290761 |
+| 5 | 0.298793 |
+
+The best checkpoint is from epoch 2. Later epochs completed but had higher validation loss.
+
+## Load the adapter
 
 ```python
 from peft import PeftModel
