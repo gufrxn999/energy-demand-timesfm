@@ -29,7 +29,12 @@ class TimesFMZeroShot:
         self.context_length = context_length
         self.model_id = model_id
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        dtype = torch.bfloat16 if device == "cuda" else torch.float32
+        if device == "cuda":
+            # T4 and older NVIDIA GPUs do not support BF16 model weights.
+            major, _ = torch.cuda.get_device_capability()
+            dtype = torch.bfloat16 if major >= 8 else torch.float16
+        else:
+            dtype = torch.float32
         self.device = device
         self.model = TimesFm2_5ModelForPrediction.from_pretrained(
             model_id, torch_dtype=dtype, device_map=device
