@@ -10,13 +10,16 @@ It compares three approaches on matching forecast timestamps:
 2. **TimesFM 2.5 zero-shot:** use the pretrained model without adapting it to PJME.
 3. **TimesFM 2.5 + LoRA:** use the pretrained model with an adapter trained on PJME.
 
-The repository contains an end-to-end research prototype, a completed CPU training run, and a sampled held-out comparison. The sample suggests an improvement, but it is not a full-test evaluation.
+The repository contains an end-to-end research prototype, an earlier CPU training run, and the latest full PJME holdout comparison from a Kaggle T4 run. The latest adapter, aggregate metrics, lead-hour metrics, and plot are committed; row-level predictions are excluded from Git.
 
 ## Start here
 
 - [README](../README.md): overview, headline result, and quick start.
 - [Results and limitations](results-and-limitations.md): metric meanings, what the test supports, caveats, and next steps.
 - [Experiment log](experiment-log.md): dataset split, environment, training history, attempted runs, and timings.
+- [Another-dataset evaluation guide](evaluating-another-dataset.md): CSV format and leakage-safe transfer evaluation.
+- [Full Kaggle comparison](../outputs/model-comparison-kaggle-full/README.md): all 908 PJME test-window metrics.
+- [T4 adapter](../outputs/timesfm-lora-pjme-t4/README.md): selected checkpoint from the full retraining run.
 - [Comparison artifacts](../outputs/model-comparison/README.md): aggregate scores, plot, and lead-hour metrics.
 - [Adapter notes](../outputs/timesfm-lora-cpu/README.md): training configuration and selected checkpoint.
 
@@ -44,7 +47,7 @@ The repository contains an end-to-end research prototype, a completed CPU traini
     └── model-comparison/           # metrics, plot, and comparison notes
 ```
 
-The normalized PJME CSV and row-level prediction table are not committed. The compact adapter weights and aggregate comparison artifacts are committed.
+The normalized PJME CSV and row-level prediction table are not committed. The earlier and latest adapters and compact comparison artifacts are committed.
 
 ## Workflow
 
@@ -54,9 +57,9 @@ The normalized PJME CSV and row-level prediction table are not committed. The co
 4. Compare all models on the same forecast origins. Use validation while making choices and reserve test for final reporting.
 5. Save aggregate metrics, lead-hour metrics, and a plot; record preprocessing, hardware, and sample size in the experiment log.
 
-The committed run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. Five epochs completed; epoch 2 was selected by validation loss.
+The latest run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. Five epochs completed; epoch 1 was selected by validation loss.
 
-## Reproduce the committed sample
+## Reproduce the earlier committed CPU sample
 
 Place the normalized series at data/pjme_hourly.csv and install the fine-tuning dependencies. Download or cache the TimesFM checkpoint if needed. Then run:
 

@@ -1,8 +1,22 @@
 # TimesFM 2.5 PJME experiment log
 
-Last updated: 2026-11-06
+Last updated: 2026-11-07
 
-This log records the CPU feasibility work, fine-tuning history, incomplete evaluation attempts, and the final completed model comparison. The comparison below is a sampled held-out test evaluation, not a complete all-hours score.
+This log records the CPU feasibility work, fine-tuning history, incomplete early evaluation attempts, and completed model comparisons. The earlier CPU comparison below is sampled; the latest Kaggle run evaluates every daily origin in the PJME test partition.
+
+## Full PJME run on Kaggle T4 (2026-11-07)
+
+The latest training used the repository's causal forward-fill loader, 512-hour context, a 24-hour horizon, 2,000 sampled training windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. Five epochs ran on a Tesla T4 in FP16. Best validation loss was 0.273837 at epoch 1; the checkpoint was selected from validation data.
+
+The final test comparison used inference batch size 32 and all 908 daily test origins (21,792 hourly predictions). Each method was evaluated on identical timestamps:
+
+| Model | MAE | RMSE | MASE |
+| --- | ---: | ---: | ---: |
+| Weekly seasonal naive | 3,432.2825 | 4,733.9480 | 1.596026 |
+| TimesFM 2.5 zero-shot | 1,582.7728 | 2,214.4242 | 0.735996 |
+| TimesFM 2.5 LoRA | 1,536.4459 | 2,132.7119 | 0.714454 |
+
+The adapter reduced MAE by 2.9% against zero-shot TimesFM. This single PJME chronological holdout does not establish transfer to other datasets. The Kaggle archive was retrieved and unpacked. The adapter, aggregate metrics, per-lead metrics, and plot are committed at [`outputs/timesfm-lora-pjme-t4/`](../outputs/timesfm-lora-pjme-t4/README.md) and [`outputs/model-comparison-kaggle-full/`](../outputs/model-comparison-kaggle-full/README.md). The row-level prediction table remains excluded from Git.
 
 ## Dataset and split
 
