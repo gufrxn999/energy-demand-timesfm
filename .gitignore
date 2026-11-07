@@ -17,6 +17,12 @@ outputs/timesfm-lora-causal/*
 !outputs/timesfm-lora-causal/adapter_model.safetensors
 !outputs/timesfm-lora-causal/project_config.json
 !outputs/timesfm-lora-causal/README.md
+!outputs/timesfm-lora-pjme-t4/
+outputs/timesfm-lora-pjme-t4/*
+!outputs/timesfm-lora-pjme-t4/adapter_config.json
+!outputs/timesfm-lora-pjme-t4/adapter_model.safetensors
+!outputs/timesfm-lora-pjme-t4/project_config.json
+!outputs/timesfm-lora-pjme-t4/README.md
 !outputs/model-comparison/
 outputs/model-comparison/*
 !outputs/model-comparison/README.md
@@ -31,5 +37,12 @@ outputs/model-comparison-causal/*
 !outputs/model-comparison-causal/summary.csv
 !outputs/model-comparison-causal/lead_metrics.csv
 !outputs/model-comparison-causal/comparison.png
+!outputs/model-comparison-kaggle-full/
+outputs/model-comparison-kaggle-full/*
+!outputs/model-comparison-kaggle-full/README.md
+!outputs/model-comparison-kaggle-full/metrics.json
+!outputs/model-comparison-kaggle-full/summary.csv
+!outputs/model-comparison-kaggle-full/lead_metrics.csv
+!outputs/model-comparison-kaggle-full/comparison.png
 work_hf_cache/
 work_hf_cache_cpu/
