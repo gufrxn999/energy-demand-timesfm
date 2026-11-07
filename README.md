@@ -20,6 +20,18 @@ All three models were evaluated on the same 908 daily, non-overlapping forecast 
 
 Across all test windows, LoRA lowered MAE by 2.9% versus zero-shot TimesFM. No confidence interval or significance test has been calculated.
 
+## Germany transfer study
+
+A second dataset study evaluated the OPSD Germany actual-load series (MW, UTC) with fixed chronological train, validation, and test periods. On 2019 validation, the unchanged PJME LoRA adapter beat the weekly seasonal baseline, while zero-shot TimesFM did not. On the untouched 2020 test period, a separately fine-tuned Germany adapter performed best.
+
+| Germany test model | MAE (MW) | RMSE (MW) | MASE |
+| --- | ---: | ---: | ---: |
+| Weekly seasonal naive | 2,226.51 | 3,777.58 | 0.4938 |
+| TimesFM 2.5 zero-shot | 2,950.22 | 4,395.39 | 0.6543 |
+| PJME LoRA adapter, unchanged | 1,750.15 | 2,722.11 | 0.3881 |
+| Germany LoRA adapter | **1,043.04** | **1,549.25** | **0.2313** |
+
+The Germany adapter lowered MAE 40.4% versus the PJME adapter and 53.2% versus the weekly baseline across 274 daily origins (6,576 forecast hours). Gains were not universal across days. See the full [Germany transfer study](docs/germany-transfer-study.md), [validation metrics](outputs/germany_validation_summary.csv), [test metrics](outputs/germany_test_summary.csv), [training configuration](outputs/germany_training_config.json), and [test error analysis](outputs/germany_test_error_analysis.md). The report links the OPSD release, split boundaries, evaluation details, Kaggle notebook and limitations.
 ## What is complete
 
 - Hourly data loading, chronological splits, forecast models, and MAE/RMSE/MASE evaluation.

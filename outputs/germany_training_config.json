@@ -1,0 +1,29 @@
+{
+  "dataset": "OPSD DE_load_actual_entsoe_transparency, version 2020-10-06",
+  "base_model": "google/timesfm-2.5-200m-transformers",
+  "train_interval_utc": "2015-01-01T00:00:00Z/2019-01-01T00:00:00Z",
+  "validation_interval_utc": "2019-01-01T00:00:00Z/2020-01-01T00:00:00Z",
+  "test_interval_utc": "2020-01-01T00:00:00Z/2020-10-01T00:00:00Z",
+  "context_length": 512,
+  "horizon_hours": 24,
+  "lora_rank": 4,
+  "lora_alpha": 8,
+  "lora_dropout": 0.05,
+  "learning_rate": 0.00005,
+  "batch_size": 8,
+  "sampled_windows_per_epoch": 2000,
+  "seed": 42,
+  "requested_epochs": 5,
+  "early_stopping_patience": 2,
+  "validation_loss_by_epoch": [0.072297, 0.066109, 0.065613, 0.063866, 0.061289],
+  "selected_checkpoint_epoch": 5,
+  "best_validation_loss": 0.061289,
+  "hardware": "Kaggle Tesla T4, CUDA device 0",
+  "environment": {
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.20.2",
+    "peft": "0.21.2",
+    "torchao": "0.18.0"
+  }
+}
