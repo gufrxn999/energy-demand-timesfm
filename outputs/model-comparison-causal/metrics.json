@@ -1,0 +1,44 @@
+[
+  {
+    "model": "seasonal_naive",
+    "evaluation_split": "test",
+    "metrics": {
+      "MAE": 3219.1550925925926,
+      "RMSE": 4566.658735141125,
+      "MASE": 1.4969211098911859
+    },
+    "horizon_hours": 24,
+    "context_length": 512,
+    "windows_evaluated": 90,
+    "hours_evaluated": 2160,
+    "MAE_skill_vs_seasonal_naive": 0.0
+  },
+  {
+    "model": "timesfm_zero_shot",
+    "evaluation_split": "test",
+    "metrics": {
+      "MAE": 1594.6812879774307,
+      "RMSE": 2227.026433558299,
+      "MASE": 0.7415337300817608
+    },
+    "horizon_hours": 24,
+    "context_length": 512,
+    "windows_evaluated": 90,
+    "hours_evaluated": 2160,
+    "MAE_skill_vs_seasonal_naive": 0.5046273813750517
+  },
+  {
+    "model": "timesfm_lora",
+    "evaluation_split": "test",
+    "metrics": {
+      "MAE": 1485.4314290364584,
+      "RMSE": 2053.292866279155,
+      "MASE": 0.6907320708272302
+    },
+    "horizon_hours": 24,
+    "context_length": 512,
+    "windows_evaluated": 90,
+    "hours_evaluated": 2160,
+    "MAE_skill_vs_seasonal_naive": 0.5385648139617452
+  }
+]

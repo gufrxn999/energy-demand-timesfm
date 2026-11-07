@@ -1,0 +1,13 @@
+{
+  "base_model": "google/timesfm-2.5-200m-transformers",
+  "context_len": 512,
+  "horizon_len": 24,
+  "learning_rate": 5e-05,
+  "epochs_completed": 5,
+  "requested_epochs": 5,
+  "checkpoint_epoch": 2,
+  "best_validation_loss": 0.2730536279268563,
+  "lora_rank": 4,
+  "seed": 42,
+  "early_stopping_patience": 0
+}

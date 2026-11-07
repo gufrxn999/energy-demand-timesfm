@@ -53,11 +53,13 @@ Use the normalized PJME CSV at `data/pjme_hourly.csv` and install fine-tuning de
 pip install -r requirements-finetune.txt
 python scripts/compare_models.py \
   --data data/pjme_hourly.csv \
-  --adapter outputs/timesfm-lora-cpu \
+  --adapter outputs/timesfm-lora-causal \
   --split test \
   --windows 90 \
   --inference-batch-size 8
 ```
+
+The corrected causal-forward-fill retrain is in `outputs/timesfm-lora-causal`; its matched 90-window report is in `outputs/model-comparison-causal`. The earlier adapter and report are retained for comparison. See [the experiment log](docs/experiment-log.md) for training history and benchmark limitations.
 
 The real PJME CSV and row-level predictions are not committed. See [Project guide](docs/project-guide.md) for the repository map and workflow, and [Results and limitations](docs/results-and-limitations.md) for metric definitions, caveats, and next steps.
 
