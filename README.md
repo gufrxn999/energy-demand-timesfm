@@ -32,6 +32,10 @@ A second dataset study evaluated the OPSD Germany actual-load series (MW, UTC) w
 | Germany LoRA adapter | **1,043.04** | **1,549.25** | **0.2313** |
 
 The Germany adapter lowered MAE 40.4% versus the PJME adapter and 53.2% versus the weekly baseline across 274 daily origins (6,576 forecast hours). Gains were not universal across days. See the full [Germany transfer study](docs/germany-transfer-study.md), [validation metrics](outputs/germany_validation_summary.csv), [test metrics](outputs/germany_test_summary.csv), [training configuration](outputs/germany_training_config.json), and [test error analysis](outputs/germany_test_error_analysis.md). The report links the OPSD release, split boundaries, evaluation details, Kaggle notebook and limitations.
+
+## Model versions and training progression
+
+The [model progression report](outputs/model-versions/progression.md) records adapter training history, checkpoints, test comparisons, and archive status. The [versioning guide](docs/model-versioning.md) explains how to preserve each future run under a separate immutable directory. The PJME adapter weights are in Git. Germany v001's training and test results are recorded, but its adapter weight file still needs to be retrieved from the Kaggle results ZIP before it is fully archived in Git.
 ## What is complete
 
 - Hourly data loading, chronological splits, forecast models, and MAE/RMSE/MASE evaluation.

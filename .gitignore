@@ -5,6 +5,8 @@ __pycache__/
 data/*.csv
 outputs/*
 !outputs/.gitkeep
+!outputs/model-versions/
+!outputs/model-versions/**
 !outputs/timesfm-lora-cpu/
 outputs/timesfm-lora-cpu/*
 !outputs/timesfm-lora-cpu/adapter_config.json

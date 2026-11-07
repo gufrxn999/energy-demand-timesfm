@@ -64,6 +64,18 @@ def main():
     if args.patience < 0:
         raise ValueError("patience must be zero or a positive number")
 
+    output_dir = Path(args.output_dir).resolve()
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise FileExistsError(
+            f"Refusing to overwrite non-empty adapter directory: {output_dir}. "
+            "Choose a new versioned --output-dir for each run. When resuming, "
+            "use --resume-adapter with a different, empty --output-dir."
+        )
+    if args.resume_adapter and output_dir == Path(args.resume_adapter).resolve():
+        raise ValueError(
+            "A resumed run must use a new --output-dir so the previous adapter stays intact."
+        )
+
     from peft import LoraConfig, PeftModel, get_peft_model
     from transformers import TimesFm2_5ModelForPrediction
 
@@ -90,7 +102,6 @@ def main():
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, drop_last=False)
     val_loader = DataLoader(val_ds, batch_size=args.batch_size)
 
-    output_dir = Path(args.output_dir)
     base_model_name = args.base_model_name or args.model_id
     starting_epoch = 0
     best_checkpoint_epoch = 0
