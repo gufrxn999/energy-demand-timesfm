@@ -15,6 +15,6 @@ The run used an NVIDIA Tesla T4, FP16, context length 512, horizon 24, 2,000 sam
 
 The **hour-of-week profile** baseline fits the median training load for each hour of the week, then adjusts that profile by the median ratio from the most recent context week. This provides an interpretable statistical comparator alongside weekly seasonal naive. The uncertainty intervals resample contiguous seven-day blocks of paired daily-origin errors to account for dependence between adjacent forecast days. The intervals describe this holdout and are not a guarantee of future performance.
 
-See [`period_metrics.csv`](period_metrics.csv) for quarterly MAE/RMSE/MASE and [`uncertainty.json`](uncertainty.json) for the paired bootstrap results. Use `--windows 0` to evaluate every daily origin and compute block-bootstrap intervals.
+See [`period_metrics.csv`](period_metrics.csv) for quarterly MAE/RMSE/MASE, [`uncertainty.json`](uncertainty.json) for paired bootstrap results, and [`analysis_manifest.json`](analysis_manifest.json) for the provenance of the saved-prediction analysis. It records that this post-hoc analysis did not rerun TimesFM inference and hashes its source predictions. New full comparison runs also write `run_manifest.json` with inference-run provenance. Use `--windows 0` to evaluate every daily origin and compute block-bootstrap intervals.
 
 ![Full PJME comparison](comparison.png)

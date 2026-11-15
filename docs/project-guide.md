@@ -62,7 +62,7 @@ The normalized PJME CSV and full PJME row-level predictions are committed. The G
 2. Use a chronological train, validation, and test split. The committed experiment uses 70%, 15%, and 15% respectively.
 3. Train LoRA on training windows and select the checkpoint using validation loss.
 4. Compare all models on the same rolling forecast origins. Use validation while making choices and reserve test for final reporting. The comparison reports quarter-level results and paired seven-day block-bootstrap intervals when all test origins are included.
-5. Save aggregate and lead-hour metrics, calendar-period summaries, paired block-bootstrap intervals, and a plot; record preprocessing, hardware, and sample size in the experiment log.
+5. Save aggregate and lead-hour metrics, calendar-period summaries, paired block-bootstrap intervals, a plot, and a `run_manifest.json` with hashes, model revision when locally available, split boundaries, command, package versions, and hardware.
 
 The latest run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. Five epochs completed; epoch 1 was selected by validation loss.
 

@@ -15,6 +15,7 @@ import pandas as pd
 from src.data import chronological_split, load_hourly_csv
 from src.evaluation_analysis import paired_block_bootstrap, period_metrics
 from src.metrics import score
+from src.provenance import artifact_info, build_run_manifest
 from src.run_experiment import evaluate
 
 
@@ -41,6 +42,7 @@ def main():
     predictions_path = Path(args.predictions)
     output_dir = Path(args.output_dir) if args.output_dir else predictions_path.parent
     predictions = pd.read_csv(predictions_path, parse_dates=["window_start", "timestamp"])
+    source_predictions = artifact_info(predictions_path)
     required = {"model", "window_start", "timestamp", "lead_hour", "actual", "forecast"}
     missing = required - set(predictions.columns)
     if missing:
@@ -149,6 +151,25 @@ def main():
                 "not_computed_reason": str(exc)
             }
     (output_dir / "uncertainty.json").write_text(json.dumps(uncertainty, indent=2) + "\n")
+
+    analysis_manifest = build_run_manifest(
+        data_path=args.data,
+        series=series,
+        splits=splits,
+        args=vars(args),
+        model_id="google/timesfm-2.5-200m-transformers",
+        adapter_path=None,
+        operation="analysis_of_saved_forecasts",
+        extra={
+            "inference_performed": False,
+            "source_predictions": source_predictions,
+            "bootstrap_replicates": args.bootstrap_replicates,
+            "bootstrap_seed": 42,
+        },
+    )
+    (output_dir / "analysis_manifest.json").write_text(
+        json.dumps(analysis_manifest, indent=2) + "\n"
+    )
 
     first_origin = predictions["window_start"].min()
     first_window = predictions[predictions["window_start"] == first_origin]

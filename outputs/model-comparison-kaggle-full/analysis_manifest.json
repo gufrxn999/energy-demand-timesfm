@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "operation": "analysis_of_saved_forecasts",
+  "created_utc": "2026-11-15T14:37:14.967435+00:00",
+  "command": "'C:\\Users\\gufran\\Documents\\Codex\\2026-11-05\\c\\work\\energy-demand-timesfm\\.venv\\Scripts\\python.exe' scripts/analyze_saved_comparison.py --data 'data\\pjme_hourly.csv' --predictions 'outputs\\model-comparison-kaggle-full\\predictions.csv' --split test --horizon 24 --context-length 512",
+  "arguments": {
+    "data": "pjme_hourly.csv",
+    "predictions": "predictions.csv",
+    "output_dir": null,
+    "split": "test",
+    "horizon": 24,
+    "context_length": 512,
+    "train_end": null,
+    "validation_end": null,
+    "bootstrap_replicates": 2000
+  },
+  "git": {
+    "commit": "c180784f5162d41061174b94e85c5492e6339e56",
+    "branch": "codex/rigorous-pjme-evaluation",
+    "working_tree_dirty": true
+  },
+  "data": {
+    "path": "pjme_hourly.csv",
+    "kind": "file",
+    "bytes": 4797098,
+    "sha256": "2f4f64096ea7ac5db5e02b361a88ec9ac26cf77bdfeebefb7b7b259d8821849c",
+    "rows_after_regularization": 145392,
+    "start": "2002-01-01 01:00:00",
+    "end": "2018-08-03 00:00:00",
+    "timezone": null
+  },
+  "split": {
+    "evaluation_partition": "test",
+    "train_end_exclusive": null,
+    "validation_end_exclusive": null,
+    "partitions": {
+      "train": {
+        "rows": 101774,
+        "start": "2002-01-01 01:00:00",
+        "end": "2013-08-11 14:00:00"
+      },
+      "validation": {
+        "rows": 21809,
+        "start": "2013-08-11 15:00:00",
+        "end": "2016-02-06 07:00:00"
+      },
+      "test": {
+        "rows": 21809,
+        "start": "2016-02-06 08:00:00",
+        "end": "2018-08-03 00:00:00"
+      }
+    }
+  },
+  "forecast": {
+    "horizon_hours": 24,
+    "context_length_hours": 512,
+    "windows_requested": null,
+    "inference_batch_size": null,
+    "preprocessing": "hourly mean resampling; causal forward-fill up to 3 hours"
+  },
+  "model": {
+    "id": "google/timesfm-2.5-200m-transformers",
+    "cached_revision": null,
+    "adapter": null
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "3.1.1",
+      "matplotlib": "3.11.2",
+      "torch": "2.15.0",
+      "transformers": "5.22.1",
+      "accelerate": "1.15.0",
+      "peft": "0.21.2",
+      "huggingface-hub": "2.4.0"
+    },
+    "hardware": {
+      "torch_cuda_available": false,
+      "cuda_version": null,
+      "gpu": null
+    }
+  },
+  "inference_performed": false,
+  "source_predictions": {
+    "path": "predictions.csv",
+    "kind": "file",
+    "bytes": 7170886,
+    "sha256": "7824d9c68edae529c5e1f97a9a3ffef708b5c9bbbbc3e8d5d88717cee0fc2612"
+  },
+  "bootstrap_replicates": 2000,
+  "bootstrap_seed": 42
+}

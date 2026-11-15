@@ -12,8 +12,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from src.data import load_hourly_csv
+from src.data import chronological_split, load_hourly_csv
 from src.evaluation_analysis import period_metrics, paired_block_bootstrap
+from src.provenance import build_run_manifest
 from src.run_experiment import evaluate
 
 
@@ -75,6 +76,17 @@ def main():
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    splits = chronological_split(series, train_end=args.train_end,
+                                 validation_end=args.validation_end)
+    manifest = build_run_manifest(
+        data_path=args.data,
+        series=series,
+        splits=splits,
+        args=vars(args),
+        model_id=args.model_id,
+        adapter_path=args.adapter,
+    )
+    (output_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (output_dir / "metrics.json").write_text(json.dumps(summary, indent=2) + "\n")
     pd.DataFrame([
         {"model": result["model"], **result["metrics"],
