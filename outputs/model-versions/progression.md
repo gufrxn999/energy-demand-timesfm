@@ -13,6 +13,8 @@ TimesFM 2.5 remains the shared frozen base. Each trained version adds a small PE
 
 The table reports metrics within each dataset. PJME and Germany MAE values are not comparable because they use different series and scales. On Germany's untouched 2020 period, the Germany adapter's MAE was 40.4% lower than the unchanged PJME adapter's and 53.2% lower than the weekly seasonal-naive baseline's. It had lower daily MAE than the weekly baseline on 81.8% of days; some days were worse.
 
+The PJME adapter file SHA-256 is `4a50120f7e600a4a2b54940e273436642a27f5ebf449fe84deb461d43bdb97b8`. Its training CSV SHA-256 is `2f4f64096ea7ac5db5e02b361a88ec9ac26cf77bdfeebefb7b7b259d8821849c`. The base model ID is recorded, but the original upstream checkpoint revision was not pinned.
+
 ## Training progression for Germany v001
 
 | Epoch | Validation loss | Change from prior epoch |
