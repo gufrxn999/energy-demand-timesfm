@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 
 from src.data import load_hourly_csv
+from src.evaluation_analysis import period_metrics, paired_block_bootstrap
 from src.run_experiment import evaluate
 
 
@@ -37,6 +38,7 @@ def main():
     series = load_hourly_csv(args.data)
     comparisons = [
         ("seasonal_naive", "seasonal_naive", None),
+        ("hour_of_week_profile", "hour_of_week_profile", None),
         ("timesfm_zero_shot", "timesfm", None),
         ("timesfm_lora", "timesfm", args.adapter),
     ]
@@ -60,10 +62,15 @@ def main():
         forecasts.append(prediction)
         print(json.dumps(result, indent=2), flush=True)
 
-    seasonal_mae = summary[0]["metrics"]["MAE"]
+    mae_by_model = {result["model"]: result["metrics"]["MAE"] for result in summary}
+    seasonal_mae = mae_by_model["seasonal_naive"]
+    profile_mae = mae_by_model["hour_of_week_profile"]
     for result in summary:
         result["MAE_skill_vs_seasonal_naive"] = (
             1.0 - result["metrics"]["MAE"] / seasonal_mae if seasonal_mae > 0 else float("nan")
+        )
+        result["MAE_skill_vs_hour_of_week_profile"] = (
+            1.0 - result["metrics"]["MAE"] / profile_mae if profile_mae > 0 else float("nan")
         )
 
     output_dir = Path(args.output_dir)
@@ -72,6 +79,7 @@ def main():
     pd.DataFrame([
         {"model": result["model"], **result["metrics"],
          "MAE_skill_vs_seasonal_naive": result["MAE_skill_vs_seasonal_naive"],
+         "MAE_skill_vs_hour_of_week_profile": result["MAE_skill_vs_hour_of_week_profile"],
          "windows_evaluated": result["windows_evaluated"],
          "hours_evaluated": result["hours_evaluated"]}
         for result in summary
@@ -91,6 +99,30 @@ def main():
             })
     pd.DataFrame(lead_rows).to_csv(output_dir / "lead_metrics.csv", index=False)
     all_forecasts.to_csv(output_dir / "predictions.csv", index=False)
+    scale = summary[0]["seasonal_scale"]
+    period_metrics(all_forecasts, scale).to_csv(output_dir / "period_metrics.csv", index=False)
+    uncertainty = {
+        "method": "paired moving-block bootstrap over daily forecast-origin MAE",
+        "block_days": 7,
+        "bootstrap_replicates": 2000,
+        "seed": 42,
+        "interpretation": "Negative MAE difference and positive MAE reduction favor the candidate model.",
+        "comparisons": {},
+    }
+    if args.windows == 0:
+        for candidate, reference in (
+            ("timesfm_lora", "timesfm_zero_shot"),
+            ("timesfm_lora", "hour_of_week_profile"),
+            ("timesfm_lora", "seasonal_naive"),
+        ):
+            uncertainty["comparisons"][candidate + "_vs_" + reference] = paired_block_bootstrap(
+                all_forecasts, candidate, reference, args.horizon
+            )
+    else:
+        uncertainty["not_computed_reason"] = (
+            "Block-bootstrap intervals require the complete, consecutive daily origins; rerun with --windows 0."
+        )
+    (output_dir / "uncertainty.json").write_text(json.dumps(uncertainty, indent=2) + "\n")
 
     first_window = all_forecasts[all_forecasts["timestamp"] <
                                  all_forecasts["timestamp"].iloc[0] + pd.Timedelta(hours=args.horizon)]

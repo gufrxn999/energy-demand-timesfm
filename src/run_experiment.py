@@ -11,7 +11,7 @@ import pandas as pd
 
 from .data import chronological_split, load_hourly_csv
 from .metrics import score
-from .models import TimesFMZeroShot, seasonal_naive
+from .models import TimesFMZeroShot, hour_of_week_profile, seasonal_naive
 
 
 def evaluate(series: pd.Series, model_name: str, horizon: int, context_length: int,
@@ -28,6 +28,8 @@ def evaluate(series: pd.Series, model_name: str, horizon: int, context_length: i
     if split_name not in {"validation", "test"}:
         raise ValueError("split must be 'validation' or 'test'")
     part = splits.validation if split_name == "validation" else splits.test
+    if model_name not in {"timesfm", "seasonal_naive", "hour_of_week_profile"}:
+        raise ValueError(f"Unknown model: {model_name}")
     model = (TimesFMZeroShot(context_length, horizon, adapter, model_id)
              if model_name == "timesfm" else None)
 
@@ -38,28 +40,36 @@ def evaluate(series: pd.Series, model_name: str, horizon: int, context_length: i
     starts = np.arange(0, len(part) - horizon + 1, horizon, dtype=int)
     if max_windows and len(starts) > max_windows:
         starts = starts[np.linspace(0, len(starts) - 1, max_windows, dtype=int)]
-    contexts, actual_all, records = [], [], []
+    contexts, context_series, target_indexes, actual_all, records = [], [], [], [], []
     for start in starts:
         absolute = series.index.get_loc(part.index[start])
         context_start = max(0, absolute - context_length)
-        context = series.iloc[context_start:absolute].to_numpy(dtype=np.float32)
-        if len(context) < 24:
+        context_values = series.iloc[context_start:absolute]
+        if len(context_values) < 24:
             continue
-        contexts.append(context)
+        contexts.append(context_values.to_numpy(dtype=np.float32))
+        context_series.append(context_values)
+        target_index = part.index[start:start + horizon]
+        target_indexes.append(target_index)
         actual = part.iloc[start:start + horizon].to_numpy(dtype=float)
         actual_all.extend(actual)
         records.extend(
             (part.index[start], ts, lead_hour, float(a))
             for lead_hour, (ts, a) in enumerate(
-                zip(part.index[start:start + horizon], actual)
+                zip(target_index, actual)
             )
         )
     if not contexts:
         raise ValueError("No forecast windows have enough history")
     if model:
         predicted = model.predict_many(contexts, inference_batch_size)
-    else:
+    elif model_name == "seasonal_naive":
         predicted = np.stack([seasonal_naive(context, horizon) for context in contexts])
+    else:
+        predicted = np.stack([
+            hour_of_week_profile(splits.train, context, target_index)
+            for context, target_index in zip(context_series, target_indexes)
+        ])
     predicted_all = predicted.reshape(-1)
     predictions = pd.DataFrame(
         records, columns=["window_start", "timestamp", "lead_hour", "actual"]
@@ -72,6 +82,7 @@ def evaluate(series: pd.Series, model_name: str, horizon: int, context_length: i
         "metrics": score(actual_all, predicted_all, scale),
         "horizon_hours": horizon,
         "context_length": context_length,
+        "seasonal_scale": scale,
         "windows_evaluated": len(contexts),
         "hours_evaluated": len(predicted_all),
     }

@@ -4,11 +4,12 @@
 
 This project tests whether adapting Google's pretrained TimesFM 2.5 model with a small LoRA adapter improves 24-hour-ahead forecasts of PJME hourly electricity demand.
 
-It compares three approaches on matching forecast timestamps:
+It compares four approaches on matching forecast timestamps:
 
 1. **Weekly seasonal naive:** repeat the previous week's hourly pattern.
-2. **TimesFM 2.5 zero-shot:** use the pretrained model without adapting it to PJME.
-3. **TimesFM 2.5 + LoRA:** use the pretrained model with an adapter trained on PJME.
+2. **Hour-of-week profile:** use training-set medians for each weekly hour, adjusted to the recent demand level.
+3. **TimesFM 2.5 zero-shot:** use the pretrained model without adapting it to PJME.
+4. **TimesFM 2.5 + LoRA:** use the pretrained model with an adapter trained on PJME.
 
 The repository contains an end-to-end research prototype, an earlier CPU training run, and the latest full PJME holdout comparison from a Kaggle T4 run. The normalized PJME input, latest adapter, aggregate metrics, lead-hour metrics, plot, and row-level predictions are committed. The Germany input is not; see [data and artifact availability](data-and-artifact-availability.md).
 
@@ -42,7 +43,8 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 ├── scripts/
 │   ├── make_demo_data.py           # synthetic smoke-test data
 │   ├── finetune_lora.py            # TimesFM LoRA fine-tuning
-│   └── compare_models.py           # shared-origin model comparison
+│   ├── compare_models.py           # shared-origin model comparison
+│   └── analyze_saved_comparison.py # add baseline, periods, and block-bootstrap intervals
 ├── notebooks/
 │   ├── timesfm-pjme-gpu-training.ipynb # PJME T4 training and export workflow
 │   └── germany-electricity-demand-transfer-timesfm-2-5.ipynb # historical Kaggle run
@@ -59,8 +61,8 @@ The normalized PJME CSV and full PJME row-level predictions are committed. The G
 1. Prepare hourly data with timestamp and load columns. Keep local data under data/; data files are ignored by Git.
 2. Use a chronological train, validation, and test split. The committed experiment uses 70%, 15%, and 15% respectively.
 3. Train LoRA on training windows and select the checkpoint using validation loss.
-4. Compare all models on the same forecast origins. Use validation while making choices and reserve test for final reporting.
-5. Save aggregate metrics, lead-hour metrics, and a plot; record preprocessing, hardware, and sample size in the experiment log.
+4. Compare all models on the same rolling forecast origins. Use validation while making choices and reserve test for final reporting. The comparison reports quarter-level results and paired seven-day block-bootstrap intervals when all test origins are included.
+5. Save aggregate and lead-hour metrics, calendar-period summaries, paired block-bootstrap intervals, and a plot; record preprocessing, hardware, and sample size in the experiment log.
 
 The latest run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. Five epochs completed; epoch 1 was selected by validation loss.
 

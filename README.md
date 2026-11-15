@@ -10,15 +10,16 @@ Does adapting TimesFM 2.5 to PJME improve forecasts over the pretrained model an
 
 ## Full PJME held-out comparison
 
-All three models were evaluated on the same 908 daily, non-overlapping forecast origins (21,792 hours) from the chronological test partition. This run used the causal forward-fill preprocessing used by the current loader.
+All four models were evaluated on the same 908 daily, non-overlapping forecast origins (21,792 hours) from the chronological test partition. This run used the causal forward-fill preprocessing used by the current loader.
 
 | Model | MAE | RMSE | MASE | MAE skill vs weekly naive |
 | --- | ---: | ---: | ---: | ---: |
 | Weekly seasonal naive | 3,432.28 | 4,733.95 | 1.596 | 0.0% |
+| Hour-of-week profile, recent-level adjusted | 2,771.75 | 3,898.73 | 1.289 | 19.2% |
 | TimesFM 2.5 zero-shot | 1,582.77 | 2,214.42 | 0.736 | 53.9% |
 | TimesFM 2.5 LoRA (best validation checkpoint, epoch 1) | **1,536.45** | **2,132.71** | **0.714** | **55.2%** |
 
-Across all test windows, LoRA lowered MAE by 2.9% versus zero-shot TimesFM. No confidence interval or significance test has been calculated.
+Across all test windows, LoRA lowered MAE by 2.93% versus zero-shot TimesFM. A paired moving-block bootstrap over seven-day blocks estimated a 95% interval of 0.64% to 5.11% for this holdout. The quarter breakdown shows the adapter improved MAE in 8 of 11 test quarters; results varied by quarter.
 
 ## Germany transfer study
 

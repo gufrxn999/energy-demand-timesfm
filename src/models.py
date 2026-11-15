@@ -1,5 +1,6 @@
 """Forecast model adapters."""
 import numpy as np
+import pandas as pd
 
 
 def seasonal_naive(context, horizon: int, season: int = 24 * 7) -> np.ndarray:
@@ -10,6 +11,36 @@ def seasonal_naive(context, horizon: int, season: int = 24 * 7) -> np.ndarray:
     if season < 1:
         raise ValueError("Context must contain at least one observation")
     return np.resize(values[-season:], horizon)
+
+
+def hour_of_week_profile(train: pd.Series, context: pd.Series,
+                         forecast_index: pd.DatetimeIndex) -> np.ndarray:
+    """Forecast a training-set hour-of-week median profile with recent-level adjustment.
+
+    The profile is fit only on the training partition. The median ratio from the
+    latest complete context week adjusts it to the current demand level.
+    """
+    if len(train) == 0 or len(context) < 24 * 7:
+        raise ValueError("Training data and at least one context week are required")
+    train_slots = train.index.dayofweek * 24 + train.index.hour
+    profile = train.groupby(train_slots).median().reindex(range(24 * 7))
+    if profile.isna().any():
+        raise ValueError("Training data must cover all 168 hours of the week")
+
+    context_slots = context.index.dayofweek * 24 + context.index.hour
+    recent_profile = profile.reindex(context_slots[-24 * 7:]).to_numpy(dtype=float)
+    recent_values = context.to_numpy(dtype=float)[-24 * 7:]
+    ratios = recent_values / recent_profile
+    ratios = ratios[np.isfinite(ratios) & (recent_profile != 0)]
+    if not len(ratios):
+        raise ValueError("Could not estimate a finite recent demand-level adjustment")
+    level = float(np.clip(np.median(ratios), 0.5, 1.5))
+
+    forecast_slots = forecast_index.dayofweek * 24 + forecast_index.hour
+    forecast = profile.reindex(forecast_slots).to_numpy(dtype=float) * level
+    if not np.isfinite(forecast).all():
+        raise ValueError("Hour-of-week profile produced a non-finite forecast")
+    return forecast
 
 
 class TimesFMZeroShot:

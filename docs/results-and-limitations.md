@@ -8,15 +8,18 @@ The earlier experiment ran on CPU. The latest full comparison used Kaggle's NVID
 
 ## Latest full PJME comparison
 
-The latest retraining used the same causal forward-fill loader as evaluation, with 512 context hours, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and five epochs. The best validation checkpoint was epoch 1 (validation loss 0.273837). The final test comparison covers every daily test origin: 908 windows and 21,792 forecast hours.
+The latest retraining used the same causal forward-fill loader as evaluation, with 512 context hours, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and five epochs. The best validation checkpoint was epoch 1 (validation loss 0.273837). The final test comparison covers every daily test origin: 908 windows and 21,792 forecast hours. It includes weekly seasonal naive, a training-fitted hour-of-week profile, zero-shot TimesFM, and PJME LoRA.
 
 | Model | MAE | RMSE | MASE |
 | --- | ---: | ---: | ---: |
 | Weekly seasonal naive | 3,432.28 | 4,733.95 | 1.596 |
+| Hour-of-week profile, recent-level adjusted | 2,771.75 | 3,898.73 | 1.289 |
 | TimesFM 2.5 zero-shot | 1,582.77 | 2,214.42 | 0.736 |
 | TimesFM 2.5 LoRA | **1,536.45** | **2,132.71** | **0.714** |
 
-The LoRA adapter lowered MAE by 2.9% against zero-shot TimesFM across this holdout. No confidence interval or significance test has been calculated. The [adapter](../outputs/timesfm-lora-pjme-t4/README.md), [aggregate metrics](../outputs/model-comparison-kaggle-full/summary.csv), [per-lead metrics](../outputs/model-comparison-kaggle-full/lead_metrics.csv), [plot](../outputs/model-comparison-kaggle-full/comparison.png), and [row-level predictions](../outputs/model-comparison-kaggle-full/predictions.csv) are committed.
+The LoRA adapter lowered MAE by 2.93% against zero-shot TimesFM across this holdout. A paired moving-block bootstrap with seven-day blocks and 2,000 resamples gives a 95% interval of 0.64% to 5.11% for the MAE reduction. LoRA had lower MAE than zero-shot TimesFM in 8 of the 11 calendar-quarter slices, so gains were not uniform over time. The [adapter](../outputs/timesfm-lora-pjme-t4/README.md), [aggregate metrics](../outputs/model-comparison-kaggle-full/summary.csv), [quarterly metrics](../outputs/model-comparison-kaggle-full/period_metrics.csv), [bootstrap intervals](../outputs/model-comparison-kaggle-full/uncertainty.json), [per-lead metrics](../outputs/model-comparison-kaggle-full/lead_metrics.csv), [plot](../outputs/model-comparison-kaggle-full/comparison.png), and [row-level predictions](../outputs/model-comparison-kaggle-full/predictions.csv) are committed.
+
+The hour-of-week profile is fit using training data only. It predicts the median load for each hour-of-week and scales that profile by the median actual-to-profile ratio from the latest context week. This adds an interpretable statistical comparator; it is not a fitted ARIMA model.
 
 ## Earlier CPU training run
 
@@ -47,18 +50,18 @@ On the sampled forecast days, LoRA has lower daily MAE than zero-shot TimesFM on
 
 ## Limitations of the latest result
 
-1. **Uncertainty is unmeasured.** The full test-period improvement has no confidence interval or paired statistical test.
-2. **One series and one split.** This tests one PJME series and one chronological holdout. It does not establish performance on other regions, datasets, seasons, or future deployment conditions.
+1. **The interval applies to one holdout.** The block bootstrap accounts for serial dependence between nearby daily forecast origins, but it does not establish performance on new regions or future operating conditions.
+2. **One series and one chronological holdout.** Quarter slices reveal variation within the 2016–2018 test interval; they are not independent retraining/test folds.
 3. **Reproduction needs the base model.** The normalized PJME CSV is included, but the TimesFM base checkpoint is not. A fresh environment needs the checkpoint and compatible inference dependencies. See [data and artifact availability](data-and-artifact-availability.md) for input details.
 
 ## Earlier evaluation attempts
 
-The all-daily-origin attempt completed the baseline but was stopped during zero-shot inference before TimesFM results were produced. A 365-window attempt was also stopped during zero-shot inference. Their baseline metrics used different origins from the final 90-window run and should not be compared with the final table. The finished 90-window run is the only committed comparison with metrics for all three models.
+Earlier sampled comparisons used fewer origins and should not be compared directly with the full test table. The current full table evaluates the same 908 daily origins for each model.
 
 ## Recommended next steps
 
 1. **Evaluate another hourly dataset** using the [transfer evaluation guide](evaluating-another-dataset.md). Keep its units and time zone explicit and compare all models on the same future holdout.
-2. **Quantify uncertainty** with paired daily errors and a time-aware block bootstrap or another suitable paired procedure. Avoid treating adjacent hourly errors as independent samples.
+2. **Add true multiple training/test folds** by fitting separate adapters at earlier chronological cutoffs. The quarterly breakdown and bootstrap intervals here still come from one fixed holdout.
 3. **Keep each test split untouched** while tuning. Select context, LoRA settings, and checkpoint on training/validation data; use the test set for the final report.
 4. **Record provenance**: dataset source/version, checkpoint revision, preprocessing version, command, package versions, hardware, and output artifacts.
 

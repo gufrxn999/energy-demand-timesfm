@@ -41,7 +41,7 @@ python scripts/compare_models.py \
   --output-dir outputs/other-dataset-test
 ```
 
-`--windows 0` evaluates every daily forecast origin in the selected chronological split. All three models are checked against the same timestamps and actual values. Each forecast uses 512 hours of history and predicts the next 24 hours by default. The split is 70% train, 15% validation, and 15% test in timestamp order; recent observations before a test origin can be used as past context, as they would be in real forecasting.
+`--windows 0` evaluates every daily forecast origin in the selected chronological split. The weekly seasonal-naive, hour-of-week profile, zero-shot TimesFM, and LoRA models are checked against the same timestamps and actual values. Each forecast uses 512 hours of history and predicts the next 24 hours by default. The split is 70% train, 15% validation, and 15% test in timestamp order; recent observations before a test origin can be used as past context, as they would be in real forecasting. Full-origin runs also save calendar-quarter summaries and paired seven-day block-bootstrap intervals.
 
 ## Interpret results fairly
 
