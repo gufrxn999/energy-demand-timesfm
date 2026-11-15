@@ -7,14 +7,18 @@
       "adapter_path": "outputs/timesfm-lora-pjme-t4",
       "weights_in_git": true,
       "base_model": "google/timesfm-2.5-200m-transformers",
+      "base_model_revision_pinned": false,
+      "adapter_sha256": "4a50120f7e600a4a2b54940e273436642a27f5ebf449fe84deb461d43bdb97b8",
+      "dataset_sha256": "2f4f64096ea7ac5db5e02b361a88ec9ac26cf77bdfeebefb7b7b259d8821849c",
       "context_hours": 512,
       "horizon_hours": 24,
       "checkpoint_epoch": 1,
       "selected_by": "validation loss",
       "test_windows": 908,
-      "test_mae": 1536.45,
-      "test_rmse": 2132.71,
-      "test_mase": 0.714
+      "test_hours": 21792,
+      "test_mae": 1536.445939432332,
+      "test_rmse": 2132.7119269382324,
+      "test_mase": 0.7144540398923631
     },
     {
       "id": "germany-lora-t4-v001",
