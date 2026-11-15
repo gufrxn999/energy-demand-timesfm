@@ -16,6 +16,7 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 ## Start here
 
 - [README](../README.md): overview, headline result, and quick start.
+- [Interactive forecast demo](../app.py): historical PJME forecasts by origin and method.
 - [Results and limitations](results-and-limitations.md): metric meanings, what the test supports, caveats, and next steps.
 - [Experiment log](experiment-log.md): dataset split, environment, training history, attempted runs, and timings.
 - [Another-dataset evaluation guide](evaluating-another-dataset.md): CSV format and leakage-safe transfer evaluation.
@@ -29,6 +30,7 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 ```text
 .
 ├── README.md                       # overview and quick start
+├── app.py                          # interactive historical forecast explorer
 ├── docs/
 │   ├── project-guide.md            # navigation and workflow
 │   ├── results-and-limitations.md  # results explained and next steps
@@ -39,12 +41,14 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 │   ├── data.py                     # hourly data loading and chronological split
 │   ├── metrics.py                  # MAE, RMSE, and MASE
 │   ├── models.py                   # baseline and TimesFM adapters
+│   ├── error_analysis.py           # hour/day/load-regime error slices
+│   ├── provenance.py               # run manifests and artifact hashes
 │   └── run_experiment.py           # single-model forecasting
 ├── scripts/
 │   ├── make_demo_data.py           # synthetic smoke-test data
 │   ├── finetune_lora.py            # TimesFM LoRA fine-tuning
 │   ├── compare_models.py           # shared-origin model comparison
-│   └── analyze_saved_comparison.py # add baseline, periods, and block-bootstrap intervals
+│   └── analyze_saved_comparison.py # baseline, periods, bootstrap, and error slices
 ├── notebooks/
 │   ├── timesfm-pjme-gpu-training.ipynb # PJME T4 training and export workflow
 │   └── germany-electricity-demand-transfer-timesfm-2-5.ipynb # historical Kaggle run

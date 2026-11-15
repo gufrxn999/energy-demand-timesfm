@@ -6,7 +6,7 @@ A research project testing whether LoRA fine-tuning of a pretrained time-series 
 
 ## Research question
 
-Does adapting TimesFM 2.5 to PJME improve forecasts over the pretrained model and a weekly seasonal-naive baseline?
+Does adapting TimesFM 2.5 to PJME improve forecasts over the pretrained model and statistical baselines?
 
 ## Full PJME held-out comparison
 
@@ -44,12 +44,12 @@ The [model progression report](outputs/model-versions/progression.md) records ad
 - Hourly data loading, chronological splits, forecast models, and MAE/RMSE/MASE evaluation.
 - Unit tests and GitHub Actions for the lightweight test suite.
 - Five LoRA training epochs on PJME, run on Kaggle's NVIDIA T4. The best validation loss was 0.273837 at epoch 1; later epochs did not improve it.
-- A shared-origin comparison of weekly seasonal naive, zero-shot TimesFM, and the LoRA adapter across all 908 test windows.
+- A shared-origin comparison of weekly seasonal naive, hour-of-week profile, zero-shot TimesFM, and the LoRA adapter across all 908 test windows.
 - A separate [dataset evaluation guide](docs/evaluating-another-dataset.md) for measuring transfer to another hourly series without fitting on its test partition.
 
 The run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. See the [experiment log](docs/experiment-log.md) and [results and limitations](docs/results-and-limitations.md) for provenance and caveats.
 
-The trained T4 adapter is committed in [outputs/timesfm-lora-pjme-t4](outputs/timesfm-lora-pjme-t4/README.md), along with aggregate metrics, per-lead metrics, a plot, and row-level predictions in [outputs/model-comparison-kaggle-full](outputs/model-comparison-kaggle-full/README.md).
+The trained T4 adapter is committed in [outputs/timesfm-lora-pjme-t4](outputs/timesfm-lora-pjme-t4/README.md), along with aggregate metrics, per-lead and operational-slice metrics, quarterly summaries, paired bootstrap intervals, a plot, and row-level predictions in [outputs/model-comparison-kaggle-full](outputs/model-comparison-kaggle-full/README.md).
 
 The normalized PJME input is included at [`data/pjme_hourly.csv`](data/pjme_hourly.csv), and the GPU training/export workflow is in [`notebooks/timesfm-pjme-gpu-training.ipynb`](notebooks/timesfm-pjme-gpu-training.ipynb). The full TimesFM base checkpoint is downloaded separately from Hugging Face.
 
@@ -65,6 +65,17 @@ pip install -r requirements.txt
 python scripts/make_demo_data.py
 python -m src.run_experiment --data data/demo_hourly.csv --model seasonal_naive
 ```
+
+## Interactive forecast demo
+
+Explore a historical 24-hour PJME forecast by date and model:
+
+```bash
+pip install -r requirements-demo.txt
+streamlit run app.py
+```
+
+The statistical baselines work without downloading TimesFM. To select zero-shot or LoRA, install `requirements-finetune.txt` as well and allow the base checkpoint to load from Hugging Face. The app is a historical backtest explorer: it displays actual demand for the selected test-period window and should not be presented as a live forecasting service.
 
 ## Reproduce the committed sample
 
