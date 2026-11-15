@@ -1,0 +1,60 @@
+{
+  "method": "paired moving-block bootstrap over daily forecast-origin MAE",
+  "block_days": 7,
+  "bootstrap_replicates": 2000,
+  "seed": 42,
+  "interpretation": "Negative MAE difference and positive MAE reduction favor the candidate model.",
+  "comparisons": {
+    "timesfm_lora_vs_timesfm_zero_shot": {
+      "candidate": "timesfm_lora",
+      "reference": "timesfm_zero_shot",
+      "origins": 908,
+      "block_days": 7,
+      "candidate_mae": 1536.445939432332,
+      "reference_mae": 1582.7728467764834,
+      "candidate_minus_reference_mae": -46.32690734415155,
+      "mae_difference_ci_95_lower": -83.53345599069468,
+      "mae_difference_ci_95_upper": -10.117507136901176,
+      "mae_reduction_pct": 2.92694605157664,
+      "mae_reduction_ci_95_lower_pct": 0.6419432825832941,
+      "mae_reduction_ci_95_upper_pct": 5.105150893660274,
+      "daily_win_rate": 0.5330396475770925,
+      "bootstrap_replicates": 2000,
+      "seed": 42
+    },
+    "timesfm_lora_vs_hour_of_week_profile": {
+      "candidate": "timesfm_lora",
+      "reference": "hour_of_week_profile",
+      "origins": 908,
+      "block_days": 7,
+      "candidate_mae": 1536.445939432332,
+      "reference_mae": 2771.7496999936047,
+      "candidate_minus_reference_mae": -1235.3037605612728,
+      "mae_difference_ci_95_lower": -1424.0421030240877,
+      "mae_difference_ci_95_upper": -1063.7439498383887,
+      "mae_reduction_pct": 44.56765199845149,
+      "mae_reduction_ci_95_lower_pct": 41.452176888024354,
+      "mae_reduction_ci_95_upper_pct": 47.59170841077379,
+      "daily_win_rate": 0.7841409691629956,
+      "bootstrap_replicates": 2000,
+      "seed": 42
+    },
+    "timesfm_lora_vs_seasonal_naive": {
+      "candidate": "timesfm_lora",
+      "reference": "seasonal_naive",
+      "origins": 908,
+      "block_days": 7,
+      "candidate_mae": 1536.445939432332,
+      "reference_mae": 3432.2824889867843,
+      "candidate_minus_reference_mae": -1895.8365495544524,
+      "mae_difference_ci_95_lower": -2182.5814090835192,
+      "mae_difference_ci_95_upper": -1640.8378127357155,
+      "mae_reduction_pct": 55.235446255885144,
+      "mae_reduction_ci_95_lower_pct": 52.08576124952889,
+      "mae_reduction_ci_95_upper_pct": 58.35777082460584,
+      "daily_win_rate": 0.8094713656387665,
+      "bootstrap_replicates": 2000,
+      "seed": 42
+    }
+  }
+}

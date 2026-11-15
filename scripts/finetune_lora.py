@@ -16,6 +16,7 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 
 from src.data import chronological_split, load_hourly_csv
+from src.provenance import build_run_manifest
 
 
 class WindowDataset(Dataset):
@@ -43,6 +44,7 @@ def main():
     parser.add_argument("--data", required=True)
     parser.add_argument("--train-end", help="Exclusive timestamp boundary for training")
     parser.add_argument("--validation-end", help="Exclusive timestamp boundary for validation")
+    parser.add_argument("--test-end", help="Optional exclusive timestamp boundary for test reporting")
     parser.add_argument("--model-id", default="google/timesfm-2.5-200m-transformers")
     parser.add_argument("--context-len", type=int, default=512)
     parser.add_argument("--horizon-len", type=int, default=24)
@@ -89,8 +91,10 @@ def main():
         dtype = torch.bfloat16 if major >= 8 else torch.float16
     else:
         dtype = torch.float32
-    split = chronological_split(load_hourly_csv(args.data), train_end=args.train_end,
-                                validation_end=args.validation_end)
+    series = load_hourly_csv(args.data)
+    split = chronological_split(series, train_end=args.train_end,
+                                validation_end=args.validation_end,
+                                test_end=args.test_end)
     context_len = args.context_len
     model = TimesFm2_5ModelForPrediction.from_pretrained(
         args.model_id, torch_dtype=dtype, device_map=device
@@ -197,6 +201,38 @@ def main():
         }
         (output_dir / "project_config.json").write_text(
             json.dumps(project_config, indent=2) + "\n"
+        )
+        manifest = build_run_manifest(
+            data_path=args.data,
+            series=series,
+            splits=split,
+            args={
+                "data": args.data,
+                "train_end": args.train_end,
+                "validation_end": args.validation_end,
+                "test_end": args.test_end,
+                "split": "train_and_validation",
+                "context_length": context_len,
+                "horizon": args.horizon_len,
+                "windows": args.samples,
+                "inference_batch_size": None,
+                "adapter": args.resume_adapter,
+                "output_dir": str(output_dir),
+                "epochs": args.epochs,
+                "batch_size": args.batch_size,
+                "learning_rate": args.lr,
+                "lora_rank": args.lora_r,
+                "lora_alpha": args.lora_alpha,
+                "seed": args.seed,
+                "patience": args.patience,
+            },
+            model_id=args.model_id,
+            adapter_path=output_dir,
+            operation="timesfm_lora_finetuning",
+            extra={"training": project_config},
+        )
+        (output_dir / "run_manifest.json").write_text(
+            json.dumps(manifest, indent=2) + "\n"
         )
     print(f"Best validation loss: {best_val:.6f}; checkpoint epoch={best_checkpoint_epoch}; "
           f"adapter saved to {output_dir}", flush=True)

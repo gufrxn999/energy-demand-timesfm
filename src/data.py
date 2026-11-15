@@ -42,31 +42,37 @@ def load_hourly_csv(path: str | Path) -> pd.Series:
 def chronological_split(series: pd.Series, train_fraction: float = 0.7,
                         validation_fraction: float = 0.15,
                         train_end: str | pd.Timestamp | None = None,
-                        validation_end: str | pd.Timestamp | None = None) -> DataSplits:
-    if train_end is not None or validation_end is not None:
+                        validation_end: str | pd.Timestamp | None = None,
+                        test_end: str | pd.Timestamp | None = None) -> DataSplits:
+    if train_end is not None or validation_end is not None or test_end is not None:
         if train_end is None or validation_end is None:
             raise ValueError("Both train_end and validation_end are required for date-based splits")
         train_boundary = pd.Timestamp(train_end)
         validation_boundary = pd.Timestamp(validation_end)
+        test_boundary = pd.Timestamp(test_end) if test_end is not None else None
         if series.index.tz is not None:
-            if train_boundary.tzinfo is None:
-                train_boundary = train_boundary.tz_localize(series.index.tz)
-            else:
-                train_boundary = train_boundary.tz_convert(series.index.tz)
-            if validation_boundary.tzinfo is None:
-                validation_boundary = validation_boundary.tz_localize(series.index.tz)
-            else:
-                validation_boundary = validation_boundary.tz_convert(series.index.tz)
-        elif train_boundary.tzinfo is not None or validation_boundary.tzinfo is not None:
+            def align_timezone(boundary):
+                if boundary is None:
+                    return None
+                return (boundary.tz_localize(series.index.tz) if boundary.tzinfo is None
+                        else boundary.tz_convert(series.index.tz))
+            train_boundary = align_timezone(train_boundary)
+            validation_boundary = align_timezone(validation_boundary)
+            test_boundary = align_timezone(test_boundary)
+        elif any(boundary is not None and boundary.tzinfo is not None
+                 for boundary in (train_boundary, validation_boundary, test_boundary)):
             raise ValueError(
                 "Timezone-aware date boundaries require a timezone-aware series index"
             )
         if train_boundary >= validation_boundary:
             raise ValueError("train_end must be earlier than validation_end")
+        if test_boundary is not None and test_boundary <= validation_boundary:
+            raise ValueError("test_end must be later than validation_end")
         splits = DataSplits(
             series.loc[series.index < train_boundary],
             series.loc[(series.index >= train_boundary) & (series.index < validation_boundary)],
-            series.loc[series.index >= validation_boundary],
+            series.loc[(series.index >= validation_boundary) &
+                       ((series.index < test_boundary) if test_boundary is not None else True)],
         )
         if any(part.empty for part in (splits.train, splits.validation, splits.test)):
             raise ValueError("Date boundaries must leave at least one observation in each split")

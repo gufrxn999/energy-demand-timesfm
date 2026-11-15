@@ -4,20 +4,23 @@
 
 This project tests whether adapting Google's pretrained TimesFM 2.5 model with a small LoRA adapter improves 24-hour-ahead forecasts of PJME hourly electricity demand.
 
-It compares three approaches on matching forecast timestamps:
+It compares four approaches on matching forecast timestamps:
 
 1. **Weekly seasonal naive:** repeat the previous week's hourly pattern.
-2. **TimesFM 2.5 zero-shot:** use the pretrained model without adapting it to PJME.
-3. **TimesFM 2.5 + LoRA:** use the pretrained model with an adapter trained on PJME.
+2. **Hour-of-week profile:** use training-set medians for each weekly hour, adjusted to the recent demand level.
+3. **TimesFM 2.5 zero-shot:** use the pretrained model without adapting it to PJME.
+4. **TimesFM 2.5 + LoRA:** use the pretrained model with an adapter trained on PJME.
 
 The repository contains an end-to-end research prototype, an earlier CPU training run, and the latest full PJME holdout comparison from a Kaggle T4 run. The normalized PJME input, latest adapter, aggregate metrics, lead-hour metrics, plot, and row-level predictions are committed. The Germany input is not; see [data and artifact availability](data-and-artifact-availability.md).
 
 ## Start here
 
 - [README](../README.md): overview, headline result, and quick start.
+- [Interactive forecast demo](../app.py): historical PJME forecasts by origin and method.
 - [Results and limitations](results-and-limitations.md): metric meanings, what the test supports, caveats, and next steps.
 - [Experiment log](experiment-log.md): dataset split, environment, training history, attempted runs, and timings.
 - [Another-dataset evaluation guide](evaluating-another-dataset.md): CSV format and leakage-safe transfer evaluation.
+- [Rolling-origin study guide](rolling-origin-study.md): multi-fold adapter training on a GPU.
 - [Full Kaggle comparison](../outputs/model-comparison-kaggle-full/README.md): all 908 PJME test-window metrics.
 - [T4 adapter](../outputs/timesfm-lora-pjme-t4/README.md): selected checkpoint from the full retraining run.
 - [Comparison artifacts](../outputs/model-comparison/README.md): aggregate scores, plot, and lead-hour metrics.
@@ -28,6 +31,8 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 ```text
 .
 ├── README.md                       # overview and quick start
+├── app.py                          # interactive historical forecast explorer
+├── requirements-demo.txt           # optional Streamlit demo dependency
 ├── docs/
 │   ├── project-guide.md            # navigation and workflow
 │   ├── results-and-limitations.md  # results explained and next steps
@@ -38,11 +43,15 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 │   ├── data.py                     # hourly data loading and chronological split
 │   ├── metrics.py                  # MAE, RMSE, and MASE
 │   ├── models.py                   # baseline and TimesFM adapters
+│   ├── error_analysis.py           # hour/day/load-regime error slices
+│   ├── provenance.py               # run manifests and artifact hashes
 │   └── run_experiment.py           # single-model forecasting
 ├── scripts/
 │   ├── make_demo_data.py           # synthetic smoke-test data
 │   ├── finetune_lora.py            # TimesFM LoRA fine-tuning
-│   └── compare_models.py           # shared-origin model comparison
+│   ├── compare_models.py           # shared-origin model comparison
+│   ├── analyze_saved_comparison.py # baseline, periods, bootstrap, and error slices
+│   └── run_rolling_origin_study.py # expanding-window adapter study for Kaggle
 ├── notebooks/
 │   ├── timesfm-pjme-gpu-training.ipynb # PJME T4 training and export workflow
 │   └── germany-electricity-demand-transfer-timesfm-2-5.ipynb # historical Kaggle run
@@ -59,8 +68,9 @@ The normalized PJME CSV and full PJME row-level predictions are committed. The G
 1. Prepare hourly data with timestamp and load columns. Keep local data under data/; data files are ignored by Git.
 2. Use a chronological train, validation, and test split. The committed experiment uses 70%, 15%, and 15% respectively.
 3. Train LoRA on training windows and select the checkpoint using validation loss.
-4. Compare all models on the same forecast origins. Use validation while making choices and reserve test for final reporting.
-5. Save aggregate metrics, lead-hour metrics, and a plot; record preprocessing, hardware, and sample size in the experiment log.
+4. Compare all models on the same rolling forecast origins. Use validation while making choices and reserve test for final reporting. The comparison reports quarter-level results and paired seven-day block-bootstrap intervals when all test origins are included.
+5. Save aggregate, lead-hour, and operational-slice error metrics, calendar-period summaries, paired block-bootstrap intervals, a plot, and a `run_manifest.json` with hashes, model revision when locally available, split boundaries, command, package versions, and hardware.
+6. When GPU time is available, run the separate expanding-window training protocol in [the rolling-origin guide](rolling-origin-study.md).
 
 The latest run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. Five epochs completed; epoch 1 was selected by validation loss.
 

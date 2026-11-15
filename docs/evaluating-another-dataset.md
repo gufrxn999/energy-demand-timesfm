@@ -1,6 +1,6 @@
 # Evaluating another hourly demand dataset
 
-`scripts/compare_models.py` compares the weekly seasonal-naive baseline, TimesFM zero-shot, and the PJME LoRA adapter on identical forecast origins from a new hourly series. This is an inference evaluation: it does not fine-tune the adapter on the new dataset.
+`scripts/compare_models.py` compares weekly seasonal naive, an hour-of-week profile, TimesFM zero-shot, and the PJME LoRA adapter on identical forecast origins from a new hourly series. This is an inference evaluation: it does not fine-tune the adapter on the new dataset.
 
 ## Prepare the CSV
 
@@ -41,7 +41,9 @@ python scripts/compare_models.py \
   --output-dir outputs/other-dataset-test
 ```
 
-`--windows 0` evaluates every daily forecast origin in the selected chronological split. All three models are checked against the same timestamps and actual values. Each forecast uses 512 hours of history and predicts the next 24 hours by default. The split is 70% train, 15% validation, and 15% test in timestamp order; recent observations before a test origin can be used as past context, as they would be in real forecasting.
+`--windows 0` evaluates every daily forecast origin in the selected chronological split. The weekly seasonal-naive, hour-of-week profile, zero-shot TimesFM, and LoRA models are checked against the same timestamps and actual values. Each forecast uses 512 hours of history and predicts the next 24 hours by default. The split is 70% train, 15% validation, and 15% test in timestamp order; recent observations before a test origin can be used as past context, as they would in real forecasting. Full-origin runs also save calendar-quarter summaries, paired seven-day block-bootstrap intervals, MAE by hour/day type/load regime (with the high-load cutoff fit on training data), and `run_manifest.json` containing input/adapter hashes, split boundaries, available checkpoint revision, command, software versions, and hardware.
+
+For explicit date splits, provide exclusive `--train-end` and `--validation-end` timestamps. `--test-end` optionally caps the test interval so expanding-window folds can be evaluated without including later years.
 
 ## Interpret results fairly
 
@@ -50,4 +52,4 @@ python scripts/compare_models.py \
 - The PJME adapter measures transfer from PJME. A result on another series does not establish generalization to all regions or time periods.
 - Do not use the test metrics to choose settings. If the adapter needs to be fine-tuned on the new dataset, treat that as a separate experiment and preserve an untouched future holdout.
 
-The output directory contains `metrics.json`, `summary.csv`, `lead_metrics.csv`, `predictions.csv`, and `comparison.png`.
+The output directory contains aggregate, lead-hour, period, and operational-slice metrics, bootstrap intervals (for full-origin runs), run provenance, row-level predictions, and a comparison plot.

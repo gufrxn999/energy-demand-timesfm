@@ -1,6 +1,6 @@
 # TimesFM 2.5 PJME experiment log
 
-Last updated: 2026-11-07
+Last updated: 2026-11-15
 
 This log records the CPU feasibility work, fine-tuning history, incomplete early evaluation attempts, and completed model comparisons. The earlier CPU comparison below is sampled; the latest Kaggle run evaluates every daily origin in the PJME test partition.
 
@@ -13,10 +13,11 @@ The final test comparison used inference batch size 32 and all 908 daily test or
 | Model | MAE | RMSE | MASE |
 | --- | ---: | ---: | ---: |
 | Weekly seasonal naive | 3,432.2825 | 4,733.9480 | 1.596026 |
+| Hour-of-week profile, recent-level adjusted | 2,771.7497 | 3,898.7258 | 1.288876 |
 | TimesFM 2.5 zero-shot | 1,582.7728 | 2,214.4242 | 0.735996 |
 | TimesFM 2.5 LoRA | 1,536.4459 | 2,132.7119 | 0.714454 |
 
-The adapter reduced MAE by 2.9% against zero-shot TimesFM. This single PJME chronological holdout does not establish transfer to other datasets. The Kaggle archive was retrieved and unpacked. The adapter, aggregate metrics, per-lead metrics, plot, and row-level predictions are committed at [`outputs/timesfm-lora-pjme-t4/`](../outputs/timesfm-lora-pjme-t4/README.md) and [`outputs/model-comparison-kaggle-full/`](../outputs/model-comparison-kaggle-full/README.md).
+The adapter reduced MAE by 2.93% against zero-shot TimesFM. A paired seven-day moving-block bootstrap (2,000 resamples) estimated a 95% interval of 0.64% to 5.11% for that reduction. LoRA had lower MAE in 8 of 11 quarter slices; these are summaries of the same holdout, not independent folds. The Kaggle archive was retrieved and unpacked. The adapter and comparison artifacts are committed at [`outputs/timesfm-lora-pjme-t4/`](../outputs/timesfm-lora-pjme-t4/README.md) and [`outputs/model-comparison-kaggle-full/`](../outputs/model-comparison-kaggle-full/README.md).
 
 ## Dataset and split
 

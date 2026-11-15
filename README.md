@@ -2,23 +2,24 @@
 
 A research project testing whether LoRA fine-tuning of a pretrained time-series model improves 24-hour-ahead forecasts of PJME hourly electricity demand.
 
-> **Status:** A consistent-preprocessing LoRA run and full PJME test comparison have completed on Kaggle's NVIDIA T4 GPU. The comparison covers all 908 daily test windows (21,792 hourly forecasts). The adapter improved aggregate MAE by 2.9% versus zero-shot TimesFM on this PJME holdout. This is evidence for this one series and holdout, not a deployment guarantee. See [Results and limitations](docs/results-and-limitations.md).
+> **Status:** A consistent-preprocessing LoRA run and full PJME test comparison have completed on Kaggle's NVIDIA T4 GPU. The comparison covers all 908 daily test windows (21,792 hourly forecasts). The adapter improved aggregate MAE by 2.9% versus zero-shot TimesFM on this PJME holdout. A three-fold expanding-window study is prepared but still needs GPU runs. The current result is evidence for one series and holdout, not a deployment guarantee. See [Results and limitations](docs/results-and-limitations.md).
 
 ## Research question
 
-Does adapting TimesFM 2.5 to PJME improve forecasts over the pretrained model and a weekly seasonal-naive baseline?
+Does adapting TimesFM 2.5 to PJME improve forecasts over the pretrained model and statistical baselines?
 
 ## Full PJME held-out comparison
 
-All three models were evaluated on the same 908 daily, non-overlapping forecast origins (21,792 hours) from the chronological test partition. This run used the causal forward-fill preprocessing used by the current loader.
+All four models were evaluated on the same 908 daily, non-overlapping forecast origins (21,792 hours) from the chronological test partition. This run used the causal forward-fill preprocessing used by the current loader.
 
 | Model | MAE | RMSE | MASE | MAE skill vs weekly naive |
 | --- | ---: | ---: | ---: | ---: |
 | Weekly seasonal naive | 3,432.28 | 4,733.95 | 1.596 | 0.0% |
+| Hour-of-week profile, recent-level adjusted | 2,771.75 | 3,898.73 | 1.289 | 19.2% |
 | TimesFM 2.5 zero-shot | 1,582.77 | 2,214.42 | 0.736 | 53.9% |
 | TimesFM 2.5 LoRA (best validation checkpoint, epoch 1) | **1,536.45** | **2,132.71** | **0.714** | **55.2%** |
 
-Across all test windows, LoRA lowered MAE by 2.9% versus zero-shot TimesFM. No confidence interval or significance test has been calculated.
+Across all test windows, LoRA lowered MAE by 2.93% versus zero-shot TimesFM. A paired moving-block bootstrap over seven-day blocks estimated a 95% interval of 0.64% to 5.11% for this holdout. The quarter breakdown shows the adapter improved MAE in 8 of 11 test quarters; results varied by quarter.
 
 ## Germany transfer study
 
@@ -43,12 +44,12 @@ The [model progression report](outputs/model-versions/progression.md) records ad
 - Hourly data loading, chronological splits, forecast models, and MAE/RMSE/MASE evaluation.
 - Unit tests and GitHub Actions for the lightweight test suite.
 - Five LoRA training epochs on PJME, run on Kaggle's NVIDIA T4. The best validation loss was 0.273837 at epoch 1; later epochs did not improve it.
-- A shared-origin comparison of weekly seasonal naive, zero-shot TimesFM, and the LoRA adapter across all 908 test windows.
+- A shared-origin comparison of weekly seasonal naive, hour-of-week profile, zero-shot TimesFM, and the LoRA adapter across all 908 test windows.
 - A separate [dataset evaluation guide](docs/evaluating-another-dataset.md) for measuring transfer to another hourly series without fitting on its test partition.
 
 The run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. See the [experiment log](docs/experiment-log.md) and [results and limitations](docs/results-and-limitations.md) for provenance and caveats.
 
-The trained T4 adapter is committed in [outputs/timesfm-lora-pjme-t4](outputs/timesfm-lora-pjme-t4/README.md), along with aggregate metrics, per-lead metrics, a plot, and row-level predictions in [outputs/model-comparison-kaggle-full](outputs/model-comparison-kaggle-full/README.md).
+The trained T4 adapter is committed in [outputs/timesfm-lora-pjme-t4](outputs/timesfm-lora-pjme-t4/README.md), along with aggregate metrics, per-lead and operational-slice metrics, quarterly summaries, paired bootstrap intervals, a plot, and row-level predictions in [outputs/model-comparison-kaggle-full](outputs/model-comparison-kaggle-full/README.md).
 
 The normalized PJME input is included at [`data/pjme_hourly.csv`](data/pjme_hourly.csv), and the GPU training/export workflow is in [`notebooks/timesfm-pjme-gpu-training.ipynb`](notebooks/timesfm-pjme-gpu-training.ipynb). The full TimesFM base checkpoint is downloaded separately from Hugging Face.
 
@@ -65,6 +66,17 @@ python scripts/make_demo_data.py
 python -m src.run_experiment --data data/demo_hourly.csv --model seasonal_naive
 ```
 
+## Interactive forecast demo
+
+Explore a historical 24-hour PJME forecast by date and model:
+
+```bash
+pip install -r requirements-demo.txt
+streamlit run app.py
+```
+
+The statistical baselines work without downloading TimesFM. To select zero-shot or LoRA, install `requirements-finetune.txt` as well and allow the base checkpoint to load from Hugging Face. The app is a historical backtest explorer: it displays actual demand for the selected test-period window and should not be presented as a live forecasting service.
+
 ## Reproduce the committed sample
 
 Use the normalized PJME CSV at `data/pjme_hourly.csv` and install fine-tuning dependencies. Download/cache the TimesFM checkpoint if needed, then run:
@@ -80,6 +92,8 @@ python scripts/compare_models.py \
 ```
 
 Use `outputs/timesfm-lora-pjme-t4` for the full 908-window T4 run. The earlier CPU adapters and sampled reports are retained for comparison. See [the experiment log](docs/experiment-log.md) for run history and benchmark limitations.
+
+To run an expanding-window study with a separate adapter for each historical fold on Kaggle, see [the rolling-origin guide](docs/rolling-origin-study.md). The study requires GPU training; fold results are not included yet.
 
 The PJME input CSV is included; the Germany input CSV is not. See [data and artifact availability](docs/data-and-artifact-availability.md) for sources, formats, and remaining gaps. See [Project guide](docs/project-guide.md) for the repository map and workflow, and [Results and limitations](docs/results-and-limitations.md) for metric definitions, caveats, and next steps.
 
