@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "versions": [
+    {
+      "id": "pjme-lora-t4",
+      "dataset": "PJME",
+      "adapter_path": "outputs/timesfm-lora-pjme-t4",
+      "weights_in_git": true,
+      "base_model": "google/timesfm-2.5-200m-transformers",
+      "context_hours": 512,
+      "horizon_hours": 24,
+      "checkpoint_epoch": 1,
+      "selected_by": "validation loss",
+      "test_windows": 908,
+      "test_mae": 1536.45,
+      "test_rmse": 2132.71,
+      "test_mase": 0.714
+    },
+    {
+      "id": "germany-lora-t4-v001",
+      "dataset": "OPSD Germany actual load",
+      "adapter_path": "outputs/model-versions/germany/v001",
+      "weights_in_git": false,
+      "weights_status": "Training and evaluation completed in Kaggle; results ZIP could not be retrieved through the Kaggle proxy during this archival pass.",
+      "base_model": "google/timesfm-2.5-200m-transformers",
+      "context_hours": 512,
+      "horizon_hours": 24,
+      "train_period_utc": "2015-01-01/2019-01-01",
+      "validation_period_utc": "2019-01-01/2020-01-01",
+      "test_period_utc": "2020-01-01/2020-10-01",
+      "checkpoint_epoch": 5,
+      "best_validation_loss": 0.061289,
+      "trainable_parameters": 1382912,
+      "test_windows": 274,
+      "test_mae_mw": 1043.0362,
+      "test_rmse_mw": 1549.2458,
+      "test_mase": 0.2313
+    }
+  ]
+}

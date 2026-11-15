@@ -17,9 +17,10 @@ from .models import TimesFMZeroShot, seasonal_naive
 def evaluate(series: pd.Series, model_name: str, horizon: int, context_length: int,
              max_windows: int = 0, adapter: str | None = None,
              split_name: str = "validation", inference_batch_size: int = 8,
-             model_id: str = "google/timesfm-2.5-200m-transformers"
+             model_id: str = "google/timesfm-2.5-200m-transformers",
+             train_end: str | None = None, validation_end: str | None = None
              ) -> tuple[dict, pd.DataFrame]:
-    splits = chronological_split(series)
+    splits = chronological_split(series, train_end=train_end, validation_end=validation_end)
     if horizon < 1 or context_length < 1:
         raise ValueError("horizon and context length must be positive")
     if max_windows < 0:
@@ -87,6 +88,8 @@ def main():
                         help="Daily forecast origins (0 evaluates every daily origin)")
     parser.add_argument("--split", choices=["validation", "test"], default="validation",
                         help="Keep test for a final comparison after model selection")
+    parser.add_argument("--train-end", help="Exclusive timestamp boundary for training")
+    parser.add_argument("--validation-end", help="Exclusive timestamp boundary for validation")
     parser.add_argument("--inference-batch-size", type=int, default=8)
     parser.add_argument("--model-id", default="google/timesfm-2.5-200m-transformers",
                         help="Local checkpoint path or Hugging Face model ID")
@@ -97,7 +100,8 @@ def main():
     series = load_hourly_csv(args.data)
     metrics, predictions = evaluate(series, args.model, args.horizon, args.context_length,
                                    args.windows, args.adapter, args.split,
-                                   args.inference_batch_size, args.model_id)
+                                   args.inference_batch_size, args.model_id,
+                                   args.train_end, args.validation_end)
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")

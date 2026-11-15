@@ -10,7 +10,7 @@ It compares three approaches on matching forecast timestamps:
 2. **TimesFM 2.5 zero-shot:** use the pretrained model without adapting it to PJME.
 3. **TimesFM 2.5 + LoRA:** use the pretrained model with an adapter trained on PJME.
 
-The repository contains an end-to-end research prototype, an earlier CPU training run, and the latest full PJME holdout comparison from a Kaggle T4 run. The latest adapter, aggregate metrics, lead-hour metrics, and plot are committed; row-level predictions are excluded from Git.
+The repository contains an end-to-end research prototype, an earlier CPU training run, and the latest full PJME holdout comparison from a Kaggle T4 run. The normalized PJME input, latest adapter, aggregate metrics, lead-hour metrics, plot, and row-level predictions are committed. The Germany input is not; see [data and artifact availability](data-and-artifact-availability.md).
 
 ## Start here
 
@@ -32,6 +32,8 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 │   ├── project-guide.md            # navigation and workflow
 │   ├── results-and-limitations.md  # results explained and next steps
 │   └── experiment-log.md           # detailed run history
+├── data/
+│   └── pjme_hourly.csv              # normalized PJME input used in the run
 ├── src/
 │   ├── data.py                     # hourly data loading and chronological split
 │   ├── metrics.py                  # MAE, RMSE, and MASE
@@ -41,13 +43,16 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 │   ├── make_demo_data.py           # synthetic smoke-test data
 │   ├── finetune_lora.py            # TimesFM LoRA fine-tuning
 │   └── compare_models.py           # shared-origin model comparison
+├── notebooks/
+│   ├── timesfm-pjme-gpu-training.ipynb # PJME T4 training and export workflow
+│   └── germany-electricity-demand-transfer-timesfm-2-5.ipynb # historical Kaggle run
 ├── tests/                          # unit tests
 └── outputs/
     ├── timesfm-lora-cpu/           # selected adapter and training notes
     └── model-comparison/           # metrics, plot, and comparison notes
 ```
 
-The normalized PJME CSV and row-level prediction table are not committed. The earlier and latest adapters and compact comparison artifacts are committed.
+The normalized PJME CSV and full PJME row-level predictions are committed. The Germany CSV and Germany adapter weights are not. Both the PJME T4 notebook and historical Germany Kaggle notebook are included.
 
 ## Workflow
 

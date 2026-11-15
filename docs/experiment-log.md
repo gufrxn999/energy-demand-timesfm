@@ -16,11 +16,11 @@ The final test comparison used inference batch size 32 and all 908 daily test or
 | TimesFM 2.5 zero-shot | 1,582.7728 | 2,214.4242 | 0.735996 |
 | TimesFM 2.5 LoRA | 1,536.4459 | 2,132.7119 | 0.714454 |
 
-The adapter reduced MAE by 2.9% against zero-shot TimesFM. This single PJME chronological holdout does not establish transfer to other datasets. The Kaggle archive was retrieved and unpacked. The adapter, aggregate metrics, per-lead metrics, and plot are committed at [`outputs/timesfm-lora-pjme-t4/`](../outputs/timesfm-lora-pjme-t4/README.md) and [`outputs/model-comparison-kaggle-full/`](../outputs/model-comparison-kaggle-full/README.md). The row-level prediction table remains excluded from Git.
+The adapter reduced MAE by 2.9% against zero-shot TimesFM. This single PJME chronological holdout does not establish transfer to other datasets. The Kaggle archive was retrieved and unpacked. The adapter, aggregate metrics, per-lead metrics, plot, and row-level predictions are committed at [`outputs/timesfm-lora-pjme-t4/`](../outputs/timesfm-lora-pjme-t4/README.md) and [`outputs/model-comparison-kaggle-full/`](../outputs/model-comparison-kaggle-full/README.md).
 
 ## Dataset and split
 
-- Dataset: PJME hourly electricity demand from the downloaded `hourly-energy-consumption.zip` archive; normalized file: `data/pjme_hourly.csv` (`timestamp`, `load`). The CSV is not committed.
+- Dataset: PJME hourly electricity demand from the downloaded `hourly-energy-consumption.zip` archive; normalized file: [`data/pjme_hourly.csv`](../data/pjme_hourly.csv) (`timestamp`, `load`). Its source and SHA-256 are recorded in [data and artifact availability](data-and-artifact-availability.md).
 - Valid source rows: 145,362 unique timestamps.
 - Hourly timeline after regularization: 145,392 observations, from 2002-01-01 01:00 through 2018-08-03 00:00.
 - Missing observations: 30 isolated single-hour gaps.
@@ -118,7 +118,7 @@ On CPU, a 16-window TimesFM zero-shot profile took 37.22 seconds at batch size 8
 - Aggregate comparison, plot, and lead-hour metrics: [`outputs/model-comparison/`](../outputs/model-comparison/)
 - Causal-loader best adapter: [`outputs/timesfm-lora-causal/`](../outputs/timesfm-lora-causal/)
 - Causal-loader comparison: [`outputs/model-comparison-causal/`](../outputs/model-comparison-causal/)
-- The row-level `predictions.csv` is generated locally by the comparison script but is intentionally not committed.
+- The row-level `predictions.csv` from the full T4 comparison is committed under `outputs/model-comparison-kaggle-full/`. Other comparison runs can generate their own prediction files locally.
 
 Run a CPU-friendlier sampled comparison with:
 

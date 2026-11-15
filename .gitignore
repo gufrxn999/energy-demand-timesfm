@@ -3,8 +3,11 @@
 __pycache__/
 *.py[cod]
 data/*.csv
+!data/pjme_hourly.csv
 outputs/*
 !outputs/.gitkeep
+!outputs/model-versions/
+!outputs/model-versions/**
 !outputs/timesfm-lora-cpu/
 outputs/timesfm-lora-cpu/*
 !outputs/timesfm-lora-cpu/adapter_config.json
@@ -43,6 +46,7 @@ outputs/model-comparison-kaggle-full/*
 !outputs/model-comparison-kaggle-full/metrics.json
 !outputs/model-comparison-kaggle-full/summary.csv
 !outputs/model-comparison-kaggle-full/lead_metrics.csv
+!outputs/model-comparison-kaggle-full/predictions.csv
 !outputs/model-comparison-kaggle-full/comparison.png
 work_hf_cache/
 work_hf_cache_cpu/

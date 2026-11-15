@@ -24,6 +24,8 @@ def main():
                         help="Local checkpoint path or Hugging Face model ID")
     parser.add_argument("--split", choices=["validation", "test"], default="validation",
                         help="Use test only for a final comparison after model selection")
+    parser.add_argument("--train-end", help="Exclusive timestamp boundary for training")
+    parser.add_argument("--validation-end", help="Exclusive timestamp boundary for validation")
     parser.add_argument("--horizon", type=int, default=24)
     parser.add_argument("--context-length", type=int, default=512)
     parser.add_argument("--windows", type=int, default=0,
@@ -44,7 +46,7 @@ def main():
         result, prediction = evaluate(
             series, model_name, args.horizon, args.context_length,
             args.windows, adapter, args.split, args.inference_batch_size,
-            args.model_id,
+            args.model_id, args.train_end, args.validation_end,
         )
         actual_index = pd.DatetimeIndex(prediction["timestamp"])
         actual_values = prediction["actual"].to_numpy()

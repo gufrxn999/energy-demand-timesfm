@@ -32,6 +32,12 @@ A second dataset study evaluated the OPSD Germany actual-load series (MW, UTC) w
 | Germany LoRA adapter | **1,043.04** | **1,549.25** | **0.2313** |
 
 The Germany adapter lowered MAE 40.4% versus the PJME adapter and 53.2% versus the weekly baseline across 274 daily origins (6,576 forecast hours). Gains were not universal across days. See the full [Germany transfer study](docs/germany-transfer-study.md), [validation metrics](outputs/germany_validation_summary.csv), [test metrics](outputs/germany_test_summary.csv), [training configuration](outputs/germany_training_config.json), and [test error analysis](outputs/germany_test_error_analysis.md). The report links the OPSD release, split boundaries, evaluation details, Kaggle notebook and limitations.
+
+The historical Kaggle notebook used for that Germany run is now included at [`notebooks/germany-electricity-demand-transfer-timesfm-2-5.ipynb`](notebooks/germany-electricity-demand-transfer-timesfm-2-5.ipynb). It records the earlier run workflow; use it as a reference when rebuilding the Germany run, not as evidence that the missing Germany adapter has been archived.
+
+## Model versions and training progression
+
+The [model progression report](outputs/model-versions/progression.md) records adapter training history, checkpoints, test comparisons, and archive status. The [versioning guide](docs/model-versioning.md) explains how to preserve each future run under a separate immutable directory. The PJME adapter weights are in Git. Germany v001's training and test results are recorded, but its adapter weight file still needs to be retrieved from the Kaggle results ZIP before it is fully archived in Git.
 ## What is complete
 
 - Hourly data loading, chronological splits, forecast models, and MAE/RMSE/MASE evaluation.
@@ -42,7 +48,9 @@ The Germany adapter lowered MAE 40.4% versus the PJME adapter and 53.2% versus t
 
 The run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. See the [experiment log](docs/experiment-log.md) and [results and limitations](docs/results-and-limitations.md) for provenance and caveats.
 
-The trained T4 adapter is committed in [outputs/timesfm-lora-pjme-t4](outputs/timesfm-lora-pjme-t4/README.md), along with aggregate metrics, per-lead metrics, and a plot in [outputs/model-comparison-kaggle-full](outputs/model-comparison-kaggle-full/README.md). Row-level predictions are excluded from Git.
+The trained T4 adapter is committed in [outputs/timesfm-lora-pjme-t4](outputs/timesfm-lora-pjme-t4/README.md), along with aggregate metrics, per-lead metrics, a plot, and row-level predictions in [outputs/model-comparison-kaggle-full](outputs/model-comparison-kaggle-full/README.md).
+
+The normalized PJME input is included at [`data/pjme_hourly.csv`](data/pjme_hourly.csv), and the GPU training/export workflow is in [`notebooks/timesfm-pjme-gpu-training.ipynb`](notebooks/timesfm-pjme-gpu-training.ipynb). The full TimesFM base checkpoint is downloaded separately from Hugging Face.
 
 ## Quick start
 
@@ -73,7 +81,7 @@ python scripts/compare_models.py \
 
 Use `outputs/timesfm-lora-pjme-t4` for the full 908-window T4 run. The earlier CPU adapters and sampled reports are retained for comparison. See [the experiment log](docs/experiment-log.md) for run history and benchmark limitations.
 
-The real PJME CSV and row-level predictions are not committed. See [Project guide](docs/project-guide.md) for the repository map and workflow, and [Results and limitations](docs/results-and-limitations.md) for metric definitions, caveats, and next steps.
+The PJME input CSV is included; the Germany input CSV is not. See [data and artifact availability](docs/data-and-artifact-availability.md) for sources, formats, and remaining gaps. See [Project guide](docs/project-guide.md) for the repository map and workflow, and [Results and limitations](docs/results-and-limitations.md) for metric definitions, caveats, and next steps.
 
 ## Scope
 

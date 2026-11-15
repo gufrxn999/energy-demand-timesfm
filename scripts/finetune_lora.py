@@ -41,6 +41,8 @@ class WindowDataset(Dataset):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", required=True)
+    parser.add_argument("--train-end", help="Exclusive timestamp boundary for training")
+    parser.add_argument("--validation-end", help="Exclusive timestamp boundary for validation")
     parser.add_argument("--model-id", default="google/timesfm-2.5-200m-transformers")
     parser.add_argument("--context-len", type=int, default=512)
     parser.add_argument("--horizon-len", type=int, default=24)
@@ -64,6 +66,18 @@ def main():
     if args.patience < 0:
         raise ValueError("patience must be zero or a positive number")
 
+    output_dir = Path(args.output_dir).resolve()
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise FileExistsError(
+            f"Refusing to overwrite non-empty adapter directory: {output_dir}. "
+            "Choose a new versioned --output-dir for each run. When resuming, "
+            "use --resume-adapter with a different, empty --output-dir."
+        )
+    if args.resume_adapter and output_dir == Path(args.resume_adapter).resolve():
+        raise ValueError(
+            "A resumed run must use a new --output-dir so the previous adapter stays intact."
+        )
+
     from peft import LoraConfig, PeftModel, get_peft_model
     from transformers import TimesFm2_5ModelForPrediction
 
@@ -75,7 +89,8 @@ def main():
         dtype = torch.bfloat16 if major >= 8 else torch.float16
     else:
         dtype = torch.float32
-    split = chronological_split(load_hourly_csv(args.data))
+    split = chronological_split(load_hourly_csv(args.data), train_end=args.train_end,
+                                validation_end=args.validation_end)
     context_len = args.context_len
     model = TimesFm2_5ModelForPrediction.from_pretrained(
         args.model_id, torch_dtype=dtype, device_map=device
@@ -90,7 +105,6 @@ def main():
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, drop_last=False)
     val_loader = DataLoader(val_ds, batch_size=args.batch_size)
 
-    output_dir = Path(args.output_dir)
     base_model_name = args.base_model_name or args.model_id
     starting_epoch = 0
     best_checkpoint_epoch = 0
