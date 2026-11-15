@@ -20,6 +20,7 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 - [Results and limitations](results-and-limitations.md): metric meanings, what the test supports, caveats, and next steps.
 - [Experiment log](experiment-log.md): dataset split, environment, training history, attempted runs, and timings.
 - [Another-dataset evaluation guide](evaluating-another-dataset.md): CSV format and leakage-safe transfer evaluation.
+- [Rolling-origin study guide](rolling-origin-study.md): multi-fold adapter training on a GPU.
 - [Full Kaggle comparison](../outputs/model-comparison-kaggle-full/README.md): all 908 PJME test-window metrics.
 - [T4 adapter](../outputs/timesfm-lora-pjme-t4/README.md): selected checkpoint from the full retraining run.
 - [Comparison artifacts](../outputs/model-comparison/README.md): aggregate scores, plot, and lead-hour metrics.
@@ -31,6 +32,7 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 .
 ├── README.md                       # overview and quick start
 ├── app.py                          # interactive historical forecast explorer
+├── requirements-demo.txt           # optional Streamlit demo dependency
 ├── docs/
 │   ├── project-guide.md            # navigation and workflow
 │   ├── results-and-limitations.md  # results explained and next steps
@@ -48,7 +50,8 @@ The repository contains an end-to-end research prototype, an earlier CPU trainin
 │   ├── make_demo_data.py           # synthetic smoke-test data
 │   ├── finetune_lora.py            # TimesFM LoRA fine-tuning
 │   ├── compare_models.py           # shared-origin model comparison
-│   └── analyze_saved_comparison.py # baseline, periods, bootstrap, and error slices
+│   ├── analyze_saved_comparison.py # baseline, periods, bootstrap, and error slices
+│   └── run_rolling_origin_study.py # expanding-window adapter study for Kaggle
 ├── notebooks/
 │   ├── timesfm-pjme-gpu-training.ipynb # PJME T4 training and export workflow
 │   └── germany-electricity-demand-transfer-timesfm-2-5.ipynb # historical Kaggle run
@@ -67,6 +70,7 @@ The normalized PJME CSV and full PJME row-level predictions are committed. The G
 3. Train LoRA on training windows and select the checkpoint using validation loss.
 4. Compare all models on the same rolling forecast origins. Use validation while making choices and reserve test for final reporting. The comparison reports quarter-level results and paired seven-day block-bootstrap intervals when all test origins are included.
 5. Save aggregate, lead-hour, and operational-slice error metrics, calendar-period summaries, paired block-bootstrap intervals, a plot, and a `run_manifest.json` with hashes, model revision when locally available, split boundaries, command, package versions, and hardware.
+6. When GPU time is available, run the separate expanding-window training protocol in [the rolling-origin guide](rolling-origin-study.md).
 
 The latest run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per epoch, batch size 8, and LoRA rank 4 / alpha 8. Five epochs completed; epoch 1 was selected by validation loss.
 

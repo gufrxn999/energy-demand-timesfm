@@ -63,7 +63,7 @@ Earlier sampled comparisons used fewer origins and should not be compared direct
 ## Recommended next steps
 
 1. **Evaluate another hourly dataset** using the [transfer evaluation guide](evaluating-another-dataset.md). Keep its units and time zone explicit and compare all models on the same future holdout.
-2. **Add true multiple training/test folds** by fitting separate adapters at earlier chronological cutoffs. The quarterly breakdown and bootstrap intervals here still come from one fixed holdout.
+2. **Run the expanding-window study** by training separate adapters at earlier chronological cutoffs on Kaggle. The workflow is documented in [rolling-origin study](rolling-origin-study.md); the quarter breakdown and bootstrap intervals here still come from one fixed holdout.
 3. **Keep each test split untouched** while tuning. Select context, LoRA settings, and checkpoint on training/validation data; use the test set for the final report.
 4. **Record provenance**: dataset source/version, checkpoint revision, preprocessing version, command, package versions, hardware, and output artifacts.
 

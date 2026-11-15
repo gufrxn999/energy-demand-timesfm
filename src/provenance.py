@@ -145,6 +145,7 @@ def build_run_manifest(data_path: str | Path, series, splits, args: dict,
             "evaluation_partition": args.get("split"),
             "train_end_exclusive": args.get("train_end"),
             "validation_end_exclusive": args.get("validation_end"),
+            "test_end_exclusive": args.get("test_end"),
             "partitions": partitions,
         },
         "forecast": {

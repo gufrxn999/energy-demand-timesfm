@@ -31,6 +31,7 @@ def main():
     parser.add_argument("--context-length", type=int, default=512)
     parser.add_argument("--train-end", help="Exclusive timestamp boundary for training")
     parser.add_argument("--validation-end", help="Exclusive timestamp boundary for validation")
+    parser.add_argument("--test-end", help="Optional exclusive timestamp boundary for test")
     parser.add_argument("--bootstrap-replicates", type=int, default=2000)
     args = parser.parse_args()
     if args.bootstrap_replicates < 1:
@@ -38,7 +39,8 @@ def main():
 
     series = load_hourly_csv(args.data)
     splits = chronological_split(series, train_end=args.train_end,
-                                 validation_end=args.validation_end)
+                                 validation_end=args.validation_end,
+                                 test_end=args.test_end)
     scale = float(np.mean(np.abs(splits.train.to_numpy()[24:] - splits.train.to_numpy()[:-24])))
     predictions_path = Path(args.predictions)
     output_dir = Path(args.output_dir) if args.output_dir else predictions_path.parent
@@ -54,6 +56,7 @@ def main():
             series, "hour_of_week_profile", args.horizon, args.context_length,
             max_windows=0, split_name=args.split, train_end=args.train_end,
             validation_end=args.validation_end,
+            test_end=args.test_end,
         )
         reference = predictions[predictions["model"] == predictions["model"].iloc[0]]
         baseline_index = pd.MultiIndex.from_frame(baseline[["window_start", "timestamp"]])

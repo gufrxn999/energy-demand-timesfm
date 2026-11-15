@@ -2,7 +2,7 @@
 
 A research project testing whether LoRA fine-tuning of a pretrained time-series model improves 24-hour-ahead forecasts of PJME hourly electricity demand.
 
-> **Status:** A consistent-preprocessing LoRA run and full PJME test comparison have completed on Kaggle's NVIDIA T4 GPU. The comparison covers all 908 daily test windows (21,792 hourly forecasts). The adapter improved aggregate MAE by 2.9% versus zero-shot TimesFM on this PJME holdout. This is evidence for this one series and holdout, not a deployment guarantee. See [Results and limitations](docs/results-and-limitations.md).
+> **Status:** A consistent-preprocessing LoRA run and full PJME test comparison have completed on Kaggle's NVIDIA T4 GPU. The comparison covers all 908 daily test windows (21,792 hourly forecasts). The adapter improved aggregate MAE by 2.9% versus zero-shot TimesFM on this PJME holdout. A three-fold expanding-window study is prepared but still needs GPU runs. The current result is evidence for one series and holdout, not a deployment guarantee. See [Results and limitations](docs/results-and-limitations.md).
 
 ## Research question
 
@@ -92,6 +92,8 @@ python scripts/compare_models.py \
 ```
 
 Use `outputs/timesfm-lora-pjme-t4` for the full 908-window T4 run. The earlier CPU adapters and sampled reports are retained for comparison. See [the experiment log](docs/experiment-log.md) for run history and benchmark limitations.
+
+To run an expanding-window study with a separate adapter for each historical fold on Kaggle, see [the rolling-origin guide](docs/rolling-origin-study.md). The study requires GPU training; fold results are not included yet.
 
 The PJME input CSV is included; the Germany input CSV is not. See [data and artifact availability](docs/data-and-artifact-availability.md) for sources, formats, and remaining gaps. See [Project guide](docs/project-guide.md) for the repository map and workflow, and [Results and limitations](docs/results-and-limitations.md) for metric definitions, caveats, and next steps.
 

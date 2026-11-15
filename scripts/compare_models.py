@@ -29,6 +29,7 @@ def main():
                         help="Use test only for a final comparison after model selection")
     parser.add_argument("--train-end", help="Exclusive timestamp boundary for training")
     parser.add_argument("--validation-end", help="Exclusive timestamp boundary for validation")
+    parser.add_argument("--test-end", help="Optional exclusive timestamp boundary for test")
     parser.add_argument("--horizon", type=int, default=24)
     parser.add_argument("--context-length", type=int, default=512)
     parser.add_argument("--windows", type=int, default=0,
@@ -51,6 +52,7 @@ def main():
             series, model_name, args.horizon, args.context_length,
             args.windows, adapter, args.split, args.inference_batch_size,
             args.model_id, args.train_end, args.validation_end,
+            args.test_end,
         )
         actual_index = pd.DatetimeIndex(prediction["timestamp"])
         actual_values = prediction["actual"].to_numpy()
@@ -78,7 +80,8 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     splits = chronological_split(series, train_end=args.train_end,
-                                 validation_end=args.validation_end)
+                                 validation_end=args.validation_end,
+                                 test_end=args.test_end)
     manifest = build_run_manifest(
         data_path=args.data,
         series=series,
