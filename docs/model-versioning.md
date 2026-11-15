@@ -9,6 +9,8 @@ python scripts/finetune_lora.py --data data/germany_hourly_load.csv \
   --validation-end 2020-01-01T00:00:00Z
 ```
 
+Date boundaries are exclusive: training contains timestamps before `train-end`, validation runs from `train-end` up to (but not including) `validation-end`, and test contains timestamps from `validation-end` onward. For a timezone-aware input, naive boundaries are interpreted in the series timezone.
+
 The training script refuses to write into a non-empty destination so a newer run cannot silently replace an earlier adapter. A resumed run must point `--resume-adapter` to its parent checkpoint and write to a different, empty `--output-dir`. Increment the version (`v002`, `v003`, ...) for each new run. Commit `adapter_model.safetensors`, `adapter_config.json`, `project_config.json`, and a per-version README recording data provenance, split dates, command/configuration, runtime, validation history, selected checkpoint, evaluation results, and the adapter SHA-256.
 
 Use `outputs/model-versions/registry.json` for a machine-readable index and update [the progression report](../outputs/model-versions/progression.md). The report should distinguish learned LoRA tensors from the frozen TimesFM base weights. Never check in the full base model checkpoint. The PJME adapter remains at its original path for backwards compatibility.

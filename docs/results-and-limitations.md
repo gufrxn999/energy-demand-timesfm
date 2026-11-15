@@ -16,7 +16,7 @@ The latest retraining used the same causal forward-fill loader as evaluation, wi
 | TimesFM 2.5 zero-shot | 1,582.77 | 2,214.42 | 0.736 |
 | TimesFM 2.5 LoRA | **1,536.45** | **2,132.71** | **0.714** |
 
-The LoRA adapter lowered MAE by 2.9% against zero-shot TimesFM across this holdout. No confidence interval or significance test has been calculated. The [adapter](../outputs/timesfm-lora-pjme-t4/README.md), [aggregate metrics](../outputs/model-comparison-kaggle-full/summary.csv), [per-lead metrics](../outputs/model-comparison-kaggle-full/lead_metrics.csv), and plot are committed. Row-level predictions are excluded from Git.
+The LoRA adapter lowered MAE by 2.9% against zero-shot TimesFM across this holdout. No confidence interval or significance test has been calculated. The [adapter](../outputs/timesfm-lora-pjme-t4/README.md), [aggregate metrics](../outputs/model-comparison-kaggle-full/summary.csv), [per-lead metrics](../outputs/model-comparison-kaggle-full/lead_metrics.csv), [plot](../outputs/model-comparison-kaggle-full/comparison.png), and [row-level predictions](../outputs/model-comparison-kaggle-full/predictions.csv) are committed.
 
 ## Earlier CPU training run
 
@@ -49,7 +49,7 @@ On the sampled forecast days, LoRA has lower daily MAE than zero-shot TimesFM on
 
 1. **Uncertainty is unmeasured.** The full test-period improvement has no confidence interval or paired statistical test.
 2. **One series and one split.** This tests one PJME series and one chronological holdout. It does not establish performance on other regions, datasets, seasons, or future deployment conditions.
-3. **Reproduction needs the data and base model.** The normalized PJME CSV and TimesFM base checkpoint are not committed. A fresh environment needs both, plus compatible inference dependencies.
+3. **Reproduction needs the data and base model.** The exact normalized PJME CSV and TimesFM base checkpoint are not committed. A fresh environment needs both, plus compatible inference dependencies. See [data and artifact availability](data-and-artifact-availability.md) for input details.
 
 ## Earlier evaluation attempts
 

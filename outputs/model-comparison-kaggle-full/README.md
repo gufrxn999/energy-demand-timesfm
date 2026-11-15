@@ -10,6 +10,6 @@ All three methods were evaluated on the same 908 daily origins (21,792 hourly pr
 
 The LoRA model reduced MAE by 2.9% against zero-shot TimesFM on this holdout. These are aggregate metrics for one PJME series and one chronological test interval. No confidence interval or significance test was calculated.
 
-The run used an NVIDIA Tesla T4, FP16, context length 512, horizon 24, 2,000 sampled training windows per epoch, batch size 8, and inference batch size 32. The adapter, aggregate metrics, per-lead metrics, and plot are committed. Row-level predictions are excluded from Git.
+The run used an NVIDIA Tesla T4, FP16, context length 512, horizon 24, 2,000 sampled training windows per epoch, batch size 8, and inference batch size 32. The adapter, aggregate metrics, per-lead metrics, plot, and row-level predictions are committed. `predictions.csv` contains one row per forecasted hour and model, with the forecast origin, timestamp, lead hour, actual value, and forecast value.
 
 ![Full PJME comparison](comparison.png)

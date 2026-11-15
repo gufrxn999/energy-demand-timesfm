@@ -41,6 +41,8 @@ class WindowDataset(Dataset):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", required=True)
+    parser.add_argument("--train-end", help="Exclusive timestamp boundary for training")
+    parser.add_argument("--validation-end", help="Exclusive timestamp boundary for validation")
     parser.add_argument("--model-id", default="google/timesfm-2.5-200m-transformers")
     parser.add_argument("--context-len", type=int, default=512)
     parser.add_argument("--horizon-len", type=int, default=24)
@@ -87,7 +89,8 @@ def main():
         dtype = torch.bfloat16 if major >= 8 else torch.float16
     else:
         dtype = torch.float32
-    split = chronological_split(load_hourly_csv(args.data))
+    split = chronological_split(load_hourly_csv(args.data), train_end=args.train_end,
+                                validation_end=args.validation_end)
     context_len = args.context_len
     model = TimesFm2_5ModelForPrediction.from_pretrained(
         args.model_id, torch_dtype=dtype, device_map=device

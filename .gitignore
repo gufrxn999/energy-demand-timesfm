@@ -45,6 +45,7 @@ outputs/model-comparison-kaggle-full/*
 !outputs/model-comparison-kaggle-full/metrics.json
 !outputs/model-comparison-kaggle-full/summary.csv
 !outputs/model-comparison-kaggle-full/lead_metrics.csv
+!outputs/model-comparison-kaggle-full/predictions.csv
 !outputs/model-comparison-kaggle-full/comparison.png
 work_hf_cache/
 work_hf_cache_cpu/
