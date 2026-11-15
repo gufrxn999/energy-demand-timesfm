@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "operation": "analysis_of_saved_forecasts",
-  "created_utc": "2026-11-15T14:37:14.967435+00:00",
+  "created_utc": "2026-11-15T14:41:11.984985+00:00",
   "command": "'C:\\Users\\gufran\\Documents\\Codex\\2026-11-05\\c\\work\\energy-demand-timesfm\\.venv\\Scripts\\python.exe' scripts/analyze_saved_comparison.py --data 'data\\pjme_hourly.csv' --predictions 'outputs\\model-comparison-kaggle-full\\predictions.csv' --split test --horizon 24 --context-length 512",
   "arguments": {
     "data": "pjme_hourly.csv",
@@ -15,7 +15,7 @@
     "bootstrap_replicates": 2000
   },
   "git": {
-    "commit": "c180784f5162d41061174b94e85c5492e6339e56",
+    "commit": "4aec4262e864827dad549ff9e6c4e7c776d65e5a",
     "branch": "codex/rigorous-pjme-evaluation",
     "working_tree_dirty": true
   },

@@ -35,6 +35,7 @@ outputs/model-comparison/*
 !outputs/model-comparison/metrics.json
 !outputs/model-comparison/summary.csv
 !outputs/model-comparison/lead_metrics.csv
+!outputs/model-comparison/error_slices.csv
 !outputs/model-comparison/comparison.png
 !outputs/model-comparison/run_manifest.json
 !outputs/model-comparison-causal/
@@ -43,6 +44,7 @@ outputs/model-comparison-causal/*
 !outputs/model-comparison-causal/metrics.json
 !outputs/model-comparison-causal/summary.csv
 !outputs/model-comparison-causal/lead_metrics.csv
+!outputs/model-comparison-causal/error_slices.csv
 !outputs/model-comparison-causal/comparison.png
 !outputs/model-comparison-causal/run_manifest.json
 !outputs/model-comparison-kaggle-full/
@@ -51,6 +53,7 @@ outputs/model-comparison-kaggle-full/*
 !outputs/model-comparison-kaggle-full/metrics.json
 !outputs/model-comparison-kaggle-full/summary.csv
 !outputs/model-comparison-kaggle-full/lead_metrics.csv
+!outputs/model-comparison-kaggle-full/error_slices.csv
 !outputs/model-comparison-kaggle-full/predictions.csv
 !outputs/model-comparison-kaggle-full/period_metrics.csv
 !outputs/model-comparison-kaggle-full/uncertainty.json

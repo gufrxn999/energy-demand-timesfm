@@ -1,4 +1,4 @@
-"""Compare seasonal-naive, zero-shot TimesFM, and a LoRA adapter."""
+"""Compare statistical baselines, zero-shot TimesFM, and a LoRA adapter."""
 import argparse
 import json
 from pathlib import Path
@@ -14,6 +14,7 @@ import pandas as pd
 
 from src.data import chronological_split, load_hourly_csv
 from src.evaluation_analysis import period_metrics, paired_block_bootstrap
+from src.error_analysis import error_slices
 from src.provenance import build_run_manifest
 from src.run_experiment import evaluate
 
@@ -113,6 +114,7 @@ def main():
     all_forecasts.to_csv(output_dir / "predictions.csv", index=False)
     scale = summary[0]["seasonal_scale"]
     period_metrics(all_forecasts, scale).to_csv(output_dir / "period_metrics.csv", index=False)
+    error_slices(all_forecasts, splits.train).to_csv(output_dir / "error_slices.csv", index=False)
     uncertainty = {
         "method": "paired moving-block bootstrap over daily forecast-origin MAE",
         "block_days": 7,

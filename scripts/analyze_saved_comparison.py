@@ -14,6 +14,7 @@ import pandas as pd
 
 from src.data import chronological_split, load_hourly_csv
 from src.evaluation_analysis import paired_block_bootstrap, period_metrics
+from src.error_analysis import error_slices
 from src.metrics import score
 from src.provenance import artifact_info, build_run_manifest
 from src.run_experiment import evaluate
@@ -128,6 +129,7 @@ def main():
             })
     pd.DataFrame(lead_rows).to_csv(output_dir / "lead_metrics.csv", index=False)
     period_metrics(predictions, scale).to_csv(output_dir / "period_metrics.csv", index=False)
+    error_slices(predictions, splits.train).to_csv(output_dir / "error_slices.csv", index=False)
 
     uncertainty = {
         "method": "paired moving-block bootstrap over daily forecast-origin MAE",
