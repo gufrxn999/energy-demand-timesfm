@@ -50,6 +50,8 @@ The run used 512 hours of context, a 24-hour horizon, 2,000 sampled windows per 
 
 The trained T4 adapter is committed in [outputs/timesfm-lora-pjme-t4](outputs/timesfm-lora-pjme-t4/README.md), along with aggregate metrics, per-lead metrics, a plot, and row-level predictions in [outputs/model-comparison-kaggle-full](outputs/model-comparison-kaggle-full/README.md).
 
+The normalized PJME input is included at [`data/pjme_hourly.csv`](data/pjme_hourly.csv), and the GPU training/export workflow is in [`notebooks/timesfm-pjme-gpu-training.ipynb`](notebooks/timesfm-pjme-gpu-training.ipynb). The full TimesFM base checkpoint is downloaded separately from Hugging Face.
+
 ## Quick start
 
 This smoke test uses synthetic data and the seasonal-naive baseline; it does not reproduce the PJME result.
@@ -79,7 +81,7 @@ python scripts/compare_models.py \
 
 Use `outputs/timesfm-lora-pjme-t4` for the full 908-window T4 run. The earlier CPU adapters and sampled reports are retained for comparison. See [the experiment log](docs/experiment-log.md) for run history and benchmark limitations.
 
-The PJME and Germany input CSVs are not committed. See [data and artifact availability](docs/data-and-artifact-availability.md) for source links, format requirements, and what is still unavailable. See [Project guide](docs/project-guide.md) for the repository map and workflow, and [Results and limitations](docs/results-and-limitations.md) for metric definitions, caveats, and next steps.
+The PJME input CSV is included; the Germany input CSV is not. See [data and artifact availability](docs/data-and-artifact-availability.md) for sources, formats, and remaining gaps. See [Project guide](docs/project-guide.md) for the repository map and workflow, and [Results and limitations](docs/results-and-limitations.md) for metric definitions, caveats, and next steps.
 
 ## Scope
 

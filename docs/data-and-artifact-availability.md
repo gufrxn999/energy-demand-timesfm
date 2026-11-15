@@ -4,16 +4,18 @@ This page records which inputs and run artifacts are available in the repository
 
 ## PJME input data
 
-The project expects a normalized CSV with exactly these required columns:
+The exact normalized CSV used for PJME training and evaluation is included at [`data/pjme_hourly.csv`](../data/pjme_hourly.csv). Its SHA-256 is `2f4f64096ea7ac5db5e02b361a88ec9ac26cf77bdfeebefb7b7b259d8821849c`. It has 145,366 hourly observations from 2002-01-01 01:00 through 2018-08-03 00:00, in megawatts.
+
+The source is Rob Mulla's [Hourly Energy Consumption dataset on Kaggle](https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption), whose dataset page identifies PJM as the data source and declares CC0. The project's normalized CSV has these required columns:
 
 ```csv
 timestamp,load
 2002-01-01 01:00:00,30393.0
 ```
 
-Use the public [Hourly Energy Consumption dataset on Kaggle](https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption) and select `PJME_hourly.csv`. Place a normalized copy at `data/pjme_hourly.csv`. The loader accepts `timestamp` and `load`; for the Kaggle source file, rename `Datetime` to `timestamp` and `PJME_MW` to `load` before running. Preserve the original timestamps and values; the loader sorts, removes duplicate timestamps, regularizes to hourly frequency, and forward-fills gaps of at most three hours.
+The source CSV uses `Datetime` and `PJME_MW`; the included project file renames them to `timestamp` and `load`. The loader sorts, removes duplicate timestamps, regularizes to hourly frequency, and forward-fills gaps of at most three hours.
 
-The normalized PJME input used by the local experiment materials is not in this repository. The `archive.zip` supplied separately in the Codex task contains a PJME CSV whose first timestamp is `2002-12-31 01:00:00`; it does not match the available normalized run input, which begins `2002-01-01 01:00:00`. Do not substitute one for the other when claiming to reproduce the committed result. The source dataset's redistribution terms were not verified, so the data file is intentionally not checked into this repository.
+The separately supplied `archive.zip` contains a different PJME CSV whose first timestamp is `2002-12-31 01:00:00`. Use the committed normalized file above when reproducing the reported run.
 
 ## Germany input data
 
@@ -27,6 +29,6 @@ The Germany series is OPSD national actual load in MW and UTC. Its input CSV is 
 
 ## Kaggle materials and unavailable items
 
-The historical [Germany transfer notebook](../notebooks/germany-electricity-demand-transfer-timesfm-2-5.ipynb) is included. The original PJME Kaggle notebook and its exact hosted notebook URL/export were not available during this inventory. A PJME training bundle ZIP exists in a local project copy; it duplicates repository code and includes an unverified data copy, so it was not added as a second source tree. The missing Germany adapter weights are not present in the accessible local artifacts.
+The [PJME GPU training notebook](../notebooks/timesfm-pjme-gpu-training.ipynb) and historical [Germany transfer notebook](../notebooks/germany-electricity-demand-transfer-timesfm-2-5.ipynb) are included. The supplied PJME training bundle contained the exact CSV now committed here; its duplicate code was not added as a ZIP. The evaluation-code ZIP duplicates repository source, and the result ZIP's adapter and predictions are already represented in the repository. The missing Germany adapter weights are not present in the accessible local artifacts.
 
 To reproduce a run, obtain the input data from its source, normalize it as described above, install the fine-tuning dependencies, and follow the commands in the repository README and experiment log. Results can vary with checkpoint revision, dependency versions, hardware, and preprocessing.

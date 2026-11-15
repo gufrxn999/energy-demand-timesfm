@@ -49,7 +49,7 @@ On the sampled forecast days, LoRA has lower daily MAE than zero-shot TimesFM on
 
 1. **Uncertainty is unmeasured.** The full test-period improvement has no confidence interval or paired statistical test.
 2. **One series and one split.** This tests one PJME series and one chronological holdout. It does not establish performance on other regions, datasets, seasons, or future deployment conditions.
-3. **Reproduction needs the data and base model.** The exact normalized PJME CSV and TimesFM base checkpoint are not committed. A fresh environment needs both, plus compatible inference dependencies. See [data and artifact availability](data-and-artifact-availability.md) for input details.
+3. **Reproduction needs the base model.** The normalized PJME CSV is included, but the TimesFM base checkpoint is not. A fresh environment needs the checkpoint and compatible inference dependencies. See [data and artifact availability](data-and-artifact-availability.md) for input details.
 
 ## Earlier evaluation attempts
 

@@ -20,7 +20,7 @@ The adapter reduced MAE by 2.9% against zero-shot TimesFM. This single PJME chro
 
 ## Dataset and split
 
-- Dataset: PJME hourly electricity demand from the downloaded `hourly-energy-consumption.zip` archive; normalized file: `data/pjme_hourly.csv` (`timestamp`, `load`). The exact normalized run input is not committed; see [data and artifact availability](data-and-artifact-availability.md) for source and format details.
+- Dataset: PJME hourly electricity demand from the downloaded `hourly-energy-consumption.zip` archive; normalized file: [`data/pjme_hourly.csv`](../data/pjme_hourly.csv) (`timestamp`, `load`). Its source and SHA-256 are recorded in [data and artifact availability](data-and-artifact-availability.md).
 - Valid source rows: 145,362 unique timestamps.
 - Hourly timeline after regularization: 145,392 observations, from 2002-01-01 01:00 through 2018-08-03 00:00.
 - Missing observations: 30 isolated single-hour gaps.

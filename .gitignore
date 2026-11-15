@@ -3,6 +3,7 @@
 __pycache__/
 *.py[cod]
 data/*.csv
+!data/pjme_hourly.csv
 outputs/*
 !outputs/.gitkeep
 !outputs/model-versions/
